@@ -56,9 +56,16 @@ func (h *Handler) ProfileEditAvatar(c echo.Context) (err error) {
 		fmt.Println(err)
 	} else {
 		user_id_int, _ := strconv.Atoi(user_id)
-		err, _ := h.uploadAvatar(file, user_id_int)
+
+		err, filename := h.uploadAvatar(file, user_id_int)
 		if err != nil {
-			//fmt.Println(err)
+			fmt.Println(err)
+		} else {
+			for i, profile := range h.Profiles {
+				if profile.Id == user_id {
+					h.Profiles[i].Avatar = filename
+				}
+			}
 		}
 	}
 
@@ -103,6 +110,5 @@ func (h *Handler) uploadAvatar(file *multipart.FileHeader, userID int) (err erro
 		return err, ""
 	}
 
-	h.Profiles[userID].Avatar = filename
 	return nil, filename
 }
