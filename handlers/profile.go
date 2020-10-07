@@ -1,17 +1,15 @@
 package handlers
 
 import (
-	"crypto/sha256"
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"github.com/labstack/echo"
-	"io"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"strconv"
-	"strings"
-	"time"
+	"fmt"
+	"io"
+	"os"
+
 )
 
 func (h *Handler) Signup(c echo.Context) (err error) {
@@ -31,38 +29,71 @@ func (h *Handler) Signup(c echo.Context) (err error) {
 
 }
 
-func (h *Handler) ProfileEdit(c echo.Context) (err error) {
-	new_profile := new(models.Profile)
+func (h *Handler) Profile(c echo.Context) (err error) {
 	cookie, err := c.Cookie("session_id")
-	user_id := h.logInIds[cookie.Value]
-
-	if err = c.Bind(&new_profile); err != nil {
-		return
+	if err == http.ErrNoCookie {
+		return c.JSON(http.StatusBadRequest, "bad")
 	}
+	userId, ok := h.logInIds[cookie.Value]
+	if !ok {
+		return c.JSON(http.StatusBadRequest, "Unlogged user")
+	}
+	answer := new(models.Profile)
 	for i, profile := range h.Profiles {
-		if profile.Id == user_id {
-			h.Profiles[i].ConfirmChanges(*new_profile)
+		if profile.Id == userId {
+			answer = profile
 		}
 	}
-	return c.JSON(http.StatusOK, new_profile)
+
+	return c.JSON(http.StatusCreated, answer)
+}
+
+func (h *Handler) ProfileEdit(c echo.Context) (err error) {
+	newProfile := new(models.Profile)
+	cookie, err := c.Cookie("session_id")
+	if err == http.ErrNoCookie {
+		return c.JSON(http.StatusBadRequest, "bad")
+	}
+	userId, ok := h.logInIds[cookie.Value]
+	if !ok {
+		return c.JSON(http.StatusBadRequest, "Unlogged user")
+	}
+
+	if err = c.Bind(&newProfile); err != nil {
+		return
+	}
+
+	for i, profile := range h.Profiles {
+		if profile.Id == userId {
+			h.Profiles[i].ConfirmChanges(*newProfile)
+		}
+	}
+
+	return c.JSON(http.StatusOK, newProfile)
 }
 
 func (h *Handler) ProfileEditAvatar(c echo.Context) (err error) {
-	//cookie, err := c.Cookie("session_id")
-	//user_id := h.logInIds[cookie.Value]
-	user_id := "1"
+	cookie, err := c.Cookie("session_id")
+	if err == http.ErrNoCookie {
+		return c.JSON(http.StatusBadRequest, "bad")
+	}
+	userId, ok :=  h.logInIds[cookie.Value]
+	if !ok {
+		return c.JSON(http.StatusBadRequest, "Unlogged user")
+	}
+
 	file, err := c.FormFile("avatar")
 	if err != nil {
-		fmt.Println(err)
+		return c.JSON(http.StatusBadRequest, "bad")
 	} else {
-		user_id_int, _ := strconv.Atoi(user_id)
+		userIdInt, _ := strconv.Atoi(userId)
 
-		err, filename := h.uploadAvatar(file, user_id_int)
+		err, filename := h.uploadAvatar(file, userIdInt)
 		if err != nil {
 			fmt.Println(err)
 		} else {
 			for i, profile := range h.Profiles {
-				if profile.Id == user_id {
+				if profile.Id == userId {
 					h.Profiles[i].Avatar = filename
 				}
 			}
@@ -73,16 +104,16 @@ func (h *Handler) ProfileEditAvatar(c echo.Context) (err error) {
 }
 
 
-func (h *Handler) Avatar(c echo.Context) (err error) {
+func (h *Handler) Avatar(c echo.Context) (err error) {// rework
 	filename := c.Param("name")
 
-	if filename == "default_avatar.png" {
-		return c.File("./default/default_avatar.png")
+	if filename == "" {
+		return c.File("./static/avatars/default_avatar.png")
 	}
-	return c.File("./avatars/" + filename)
+	return c.File("./static/avatars/" + filename)
 }
 
-func (h *Handler) uploadAvatar(file *multipart.FileHeader, userID int) (err error, filename string) {
+func (h *Handler) UploadAvatar(file *multipart.FileHeader, userID int) (err error, filename string) {
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
@@ -90,24 +121,17 @@ func (h *Handler) uploadAvatar(file *multipart.FileHeader, userID int) (err erro
 	}
 	defer src.Close()
 
-	hash := sha256.New()
-	formattedTime := strings.Join(strings.Split(time.Now().String(), " "), "")
-	formattedID := strconv.FormatUint(uint64(userID), 10)
-
-	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID)))
+	name := strconv.Itoa(userID * 666) + "image"
 	filename = name + ".jpeg"
-	fmt.Println(name + "--------------------------")
-	dst, err := os.Create("./avatars/" + filename)
+	dst, err := os.Create("./static/avatars/" + filename)
 
 	if err != nil {
-		fmt.Println(err)
-		return err, ""
+		return c.JSON(http.StatusBadRequest, "Error while create file")
 	}
 	defer dst.Close()
 
 	if _, err = io.Copy(dst, src); err != nil {
-		fmt.Println(err)
-		return err, ""
+		return c.JSON(http.StatusBadRequest, "bad")
 	}
 
 	return nil, filename

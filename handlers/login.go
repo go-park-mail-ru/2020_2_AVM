@@ -11,16 +11,19 @@ import (
 
 func (h *Handler) Login(c echo.Context) (err error) {
 	log := new(models.Login)
-	expiration := time.Now().Add(10 * time.Hour)
+	expiration := time.Now().Add(8 * time.Hour)
 	if err = c.Bind(log); err != nil{
 		return c.JSON(http.StatusBadRequest, log)
 	}
+
 	password := ""
+
 	for _, profile := range h.Profiles {
 		if profile.Login == log.Login {
 			password = profile.Password
 		}
 	}
+
 	if log.Password == password {
 		id := shortuuid.New()
 		h.logInIds[id] = log.Login

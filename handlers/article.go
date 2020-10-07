@@ -14,6 +14,7 @@ func (h *Handler) CreateArticle(c echo.Context) (err error) {
 	if err = c.Bind(art); err != nil || cookie == nil {
 		return
 	}
+
 	if login, ok := h.logInIds[cookie.Value]; err == http.ErrNoCookie || !ok {
 		return c.JSON(http.StatusBadRequest, "Unlogined user")
 	} else {
@@ -27,9 +28,9 @@ func (h *Handler) CreateArticle(c echo.Context) (err error) {
 }
 
 func (h *Handler) ArticleByAuthor(c echo.Context) (err error) {
-
 	key := c.Param("author")
 	articles := []models.Article{}
+
 	for _, article := range h.Articles {
 		if article.Author == key {
 			articles = append(articles, article)
