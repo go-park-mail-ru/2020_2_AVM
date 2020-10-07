@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"github.com/labstack/echo"
 	"net/http"
+	"strconv"
 )
 
 func (h *Handler) Signup(c echo.Context) (err error) {
@@ -11,7 +12,7 @@ func (h *Handler) Signup(c echo.Context) (err error) {
 	if err = c.Bind(prof); err != nil {
 		return
 	}
-	prof.Id = string(h.GetNewUserId())
+	prof.Id = strconv.Itoa(h.GetNewUserId())
 	h.Profiles = append(h.Profiles, *prof)
 	return c.JSON(http.StatusCreated, prof)
 
@@ -27,7 +28,7 @@ func (h *Handler) ProfileEdit(c echo.Context) (err error) {
 	}
 	for i, profile := range h.Profiles {
 		if profile.Id == user_id {
-			h.Profiles[i].ConfirmChanges(new_profile)
+			h.Profiles[i].ConfirmChanges(*new_profile)
 		}
 	}
 

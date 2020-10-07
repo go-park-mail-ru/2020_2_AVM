@@ -18,7 +18,7 @@ func (h *Handler) CreateArticle(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, "bad")
 	}
 
-	art.Id = string(h.GetNewArcticleId())
+	art.Id = strconv.Itoa(h.GetNewArcticleId())
 
 	h.Articles = append(h.Articles, *art)
 	return c.JSON(http.StatusCreated, art)
