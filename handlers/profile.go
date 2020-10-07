@@ -39,9 +39,9 @@ func (h *Handler) Profile(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, "Unlogged user")
 	}
 	answer := new(models.Profile)
-	for i, profile := range h.Profiles {
+	for _, profile := range h.Profiles {
 		if profile.Id == userId {
-			answer = profile
+			answer = &profile
 		}
 	}
 
@@ -88,7 +88,7 @@ func (h *Handler) ProfileEditAvatar(c echo.Context) (err error) {
 	} else {
 		userIdInt, _ := strconv.Atoi(userId)
 
-		err, filename := h.uploadAvatar(file, userIdInt)
+		err, filename := h.UploadAvatar(file, userIdInt)
 		if err != nil {
 			fmt.Println(err)
 		} else {
@@ -126,12 +126,12 @@ func (h *Handler) UploadAvatar(file *multipart.FileHeader, userID int) (err erro
 	dst, err := os.Create("./static/avatars/" + filename)
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Error while create file")
+		return err, ""
 	}
 	defer dst.Close()
 
 	if _, err = io.Copy(dst, src); err != nil {
-		return c.JSON(http.StatusBadRequest, "bad")
+		return err, ""
 	}
 
 	return nil, filename
