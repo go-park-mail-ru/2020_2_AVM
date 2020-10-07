@@ -44,6 +44,13 @@ func (h *Handler) ProfileEdit(c echo.Context) (err error) {
 			h.Profiles[i].ConfirmChanges(*new_profile)
 		}
 	}
+	return c.JSON(http.StatusOK, new_profile)
+}
+
+func (h *Handler) ProfileEditAvatar(c echo.Context) (err error) {
+	cookie, err := c.Cookie("session_id")
+	user_id := h.logInIds[cookie.Value]
+
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		fmt.Println(err)
@@ -55,10 +62,9 @@ func (h *Handler) ProfileEdit(c echo.Context) (err error) {
 		}
 	}
 
-
-
-	return c.JSON(http.StatusOK, new_profile)
+	return c.JSON(http.StatusOK, "OK")
 }
+
 
 func (h *Handler) Avatar(c echo.Context) (err error) {
 	filename := c.Param("name")

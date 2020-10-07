@@ -32,6 +32,7 @@ func main() {
 	e.POST("/signin", h.Login)
 	e.POST("/logout", h.Logout)
 	e.POST("/setting", h.ProfileEdit)
+	e.POST("/setting/avatar", h.ProfileEditAvater)
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
 }
