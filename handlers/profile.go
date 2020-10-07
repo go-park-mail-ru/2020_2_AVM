@@ -104,12 +104,12 @@ func (h *Handler) ProfileEditAvatar(c echo.Context) (err error) {
 }
 
 
-func (h *Handler) Avatar(c echo.Context) (err error) {// rework
-	filename := c.Param("name")
+func (h *Handler) AvatarDefault(c echo.Context) (err error) { // rework
+	return c.File("./static/avatars/default_avatar.png")
+}
 
-	if filename == "" {
-		return c.File("./static/avatars/default_avatar.png")
-	}
+func (h *Handler) Avatar(c echo.Context) (err error) { // rework
+	filename := c.Param("name")
 	return c.File("./static/avatars/" + filename)
 }
 

@@ -13,6 +13,7 @@ func main() {
 	CSRFHeader := "X-CSRF-TOKEN"
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowCredentials: true,
 		AllowOrigins: []string{"http://localhost:1323", "http://localhost:3000"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, CSRFHeader},
 	}))
@@ -27,6 +28,7 @@ func main() {
 	e.POST("/article", h.CreateArticle)
 
 	e.GET("/article/:author", h.ArticleByAuthor)
+	e.GET("/avatar/", h.AvatarDefault)
 	e.GET("/avatar/:name", h.Avatar)
 	e.GET("/profile", h.Profile)
 	e.POST("/setting/avatar", h.ProfileEditAvatar)
