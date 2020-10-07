@@ -14,9 +14,10 @@ func (h *Handler) CreateArticle(c echo.Context) (err error) {
 	if err = c.Bind(art); err != nil || cookie == nil {
 		return
 	}
-	art.Author = h.logInIds[cookie.Value]
-	if err == http.ErrNoCookie {
-		return c.JSON(http.StatusBadRequest, "bad")
+	if login, ok := h.logInIds[cookie.Value]; err == http.ErrNoCookie || !ok {
+		return c.JSON(http.StatusBadRequest, "Unlogined user")
+	} else {
+		art.Author = login
 	}
 
 	art.Id = strconv.Itoa(h.GetNewArcticleId())
@@ -37,4 +38,3 @@ func (h *Handler) ArticleByAuthor(c echo.Context) (err error) {
 
 	return c.JSON(http.StatusOK, articles)
 }
-
