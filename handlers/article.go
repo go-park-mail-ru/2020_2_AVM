@@ -4,13 +4,14 @@ import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"github.com/labstack/echo"
 	"net/http"
+	"strconv"
 )
 
 func (h *Handler) CreateArticle(c echo.Context) (err error) {
 	art := new(models.Article)
 
 	cookie, err := c.Cookie("session_id")
-	if err = c.Bind(art); err != nil {
+	if err = c.Bind(art); err != nil || cookie == nil {
 		return
 	}
 	art.Author = h.logInIds[cookie.Value]

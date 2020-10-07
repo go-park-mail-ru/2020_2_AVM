@@ -12,13 +12,13 @@ type (
 	}
 )
 
-func (h Handler) GetNewUserId() (int) {
-	h.user_id++
+func (h *Handler) GetNewUserId() (int) {
+	h.user_id += 1
 	return h.user_id
 }
 
-func (h Handler) GetNewArcticleId() (int) {
-	h.article_id++
+func (h *Handler) GetNewArcticleId() (int) {
+	h.article_id += 1
 	return h.article_id
 }
 
