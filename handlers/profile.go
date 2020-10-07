@@ -41,7 +41,7 @@ func (h *Handler) ProfileEdit(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, new_profile)
 }
 
-func (h *Handler) avatar(c echo.Context) error {
+func (h *Handler) avatar(c echo.Context) (err error) {
 	filename := c.Param("name")
 
 	if filename == "default_avatar.png" {
