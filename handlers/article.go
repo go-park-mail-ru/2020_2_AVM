@@ -7,13 +7,19 @@ import (
 )
 
 func (h *Handler) CreateArticle(c echo.Context) (err error) {
-	//cookie, err := c.Cookie("session_id")
-	//user_id := h.logInIds[cookie.Value]
 	art := new(models.Article)
-	//art.Author = user_id
+
+	cookie, err := c.Cookie("session_id")
 	if err = c.Bind(art); err != nil {
 		return
 	}
+	art.Author = h.logInIds[cookie.Value]
+	if err == http.ErrNoCookie {
+		return c.JSON(http.StatusBadRequest, "bad")
+	}
+
+	art.Id = string(h.GetNewArcticleId())
+
 	h.Articles = append(h.Articles, *art)
 	return c.JSON(http.StatusCreated, art)
 }

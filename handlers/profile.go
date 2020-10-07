@@ -11,6 +11,7 @@ func (h *Handler) Signup(c echo.Context) (err error) {
 	if err = c.Bind(prof); err != nil {
 		return
 	}
+	prof.Id = string(h.GetNewUserId())
 	h.Profiles = append(h.Profiles, *prof)
 	return c.JSON(http.StatusCreated, prof)
 
@@ -18,12 +19,15 @@ func (h *Handler) Signup(c echo.Context) (err error) {
 
 func (h *Handler) ProfileEdit(c echo.Context) (err error) {
 	new_profile := new(models.Profile)
+	cookie, err := c.Cookie("session_id")
+	user_id := h.logInIds[cookie.Value]
+
 	if err = c.Bind(&new_profile); err != nil {
 		return
 	}
 	for i, profile := range h.Profiles {
-		if profile.Id == new_profile.Id {
-			h.Profiles[i] = *new_profile
+		if profile.Id == user_id {
+			h.Profiles[i].ConfirmChanges(new_profile)
 		}
 	}
 

@@ -11,6 +11,17 @@ type (
 		article_id int 
 	}
 )
+
+func (h Handler) GetNewUserId() (int) {
+	h.user_id++
+	return h.user_id
+}
+
+func (h Handler) GetNewArcticleId() (int) {
+	h.article_id++
+	return h.article_id
+}
+
 func NewHandler() (*Handler) {
 	return &Handler{nil, nil, map[string]string{}, 0, 0}
 }

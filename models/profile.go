@@ -9,3 +9,18 @@ type (
 		Password string `json:"password"`
 	}
 )
+func (p Profile) ConfirmChanges(profile Profile) ()  {
+	if profile.Id != "" {
+		p.Id = profile.Id
+	}
+	if profile.Login != "" {
+		p.Login = profile.Login
+	}
+	if profile.Email != "" {
+		p.Email = profile.Email
+	}
+	if profile.Password != "" {
+		p.Password = profile.Password
+	}
+
+}
