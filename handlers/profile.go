@@ -12,6 +12,12 @@ func (h *Handler) Signup(c echo.Context) (err error) {
 	if err = c.Bind(prof); err != nil {
 		return
 	}
+
+	for _, profile := range h.Profiles {
+		if profile.Login == prof.Login || profile.Email == profile.Email {
+			return c.JSON(http.StatusBadRequest, "Ununique data")
+		}
+	}
 	prof.Id = strconv.Itoa(h.GetNewUserId())
 	h.Profiles = append(h.Profiles, *prof)
 	return c.JSON(http.StatusCreated, prof)
