@@ -34,14 +34,14 @@ func (h *Handler) Profile(c echo.Context) (err error) {
 	if err == http.ErrNoCookie {
 		return c.JSON(http.StatusBadRequest, "bad")
 	}
-	userId, ok := h.logInIds[cookie.Value]
+	userLogin, ok := h.logInIds[cookie.Value]
 	if !ok {
 		return c.JSON(http.StatusBadRequest, "Unlogged user")
 	}
 	answer := new(models.Profile)
 	for _, profile := range h.Profiles {
-		if profile.Id == userId {
-			answer = &profile
+		if profile.Login == userLogin {
+			*answer = profile
 		}
 	}
 
