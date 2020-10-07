@@ -27,7 +27,7 @@ func main() {
 	e.POST("/article", h.CreateArticle)
 
 	e.GET("/article/:author", h.ArticleByAuthor)
-	e.GET("/avatar/:name", h.avatar)
+	e.GET("/avatar/:name", h.Avatar)
 	e.POST("/signup", h.Signup)
 	e.POST("/signin", h.Login)
 	e.POST("/logout", h.Logout)
