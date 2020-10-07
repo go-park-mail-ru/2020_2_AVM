@@ -48,9 +48,9 @@ func (h *Handler) ProfileEdit(c echo.Context) (err error) {
 }
 
 func (h *Handler) ProfileEditAvatar(c echo.Context) (err error) {
-	cookie, err := c.Cookie("session_id")
-	user_id := h.logInIds[cookie.Value]
-
+	//cookie, err := c.Cookie("session_id")
+	//user_id := h.logInIds[cookie.Value]
+	user_id := "1"
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		fmt.Println(err)
@@ -58,7 +58,7 @@ func (h *Handler) ProfileEditAvatar(c echo.Context) (err error) {
 		user_id_int, _ := strconv.Atoi(user_id)
 		err, _ := h.uploadAvatar(file, user_id_int)
 		if err != nil {
-			fmt.Println(err)
+			//fmt.Println(err)
 		}
 	}
 
@@ -89,6 +89,7 @@ func (h *Handler) uploadAvatar(file *multipart.FileHeader, userID int) (err erro
 
 	name := fmt.Sprintf("%x", hash.Sum([]byte(formattedTime+formattedID)))
 	filename = name + ".jpeg"
+	fmt.Println(name + "--------------------------")
 	dst, err := os.Create("./avatars/" + filename)
 
 	if err != nil {
