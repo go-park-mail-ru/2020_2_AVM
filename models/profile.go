@@ -10,9 +10,6 @@ type (
 	}
 )
 func (p Profile) ConfirmChanges(profile Profile) ()  {
-	if profile.Id != "" {
-		p.Id = profile.Id
-	}
 	if profile.Login != "" {
 		p.Login = profile.Login
 	}
@@ -22,5 +19,4 @@ func (p Profile) ConfirmChanges(profile Profile) ()  {
 	if profile.Password != "" {
 		p.Password = profile.Password
 	}
-
 }
