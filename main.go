@@ -25,7 +25,7 @@ func main() {
 	// Initialize handler
 	h := handlers.NewHandler()
 	// Routes
-	e.POST("/article", h.CreateArticle)
+	e.POST("/api/article", h.CreateArticle)
 
 	e.GET("/api/article/:author", h.ArticleByAuthor)
 	e.GET("/api/avatar/", h.AvatarDefault)
