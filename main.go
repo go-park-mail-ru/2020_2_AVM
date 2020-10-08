@@ -19,7 +19,7 @@ func main() {
 	}))
 
 
-	e.Logger.SetLevel(log.ERROR)
+	e.Logger.SetLevel(log.DEBUG)
 	e.Use(middleware.Logger())
 
 	// Initialize handler
@@ -28,7 +28,7 @@ func main() {
 	e.POST("/article", h.CreateArticle)
 
 	e.GET("/article/:author", h.ArticleByAuthor)
-	e.GET("/avatar/", h.AvatarDefault)
+	e.GET("/avatar", h.AvatarDefault)
 	e.GET("/avatar/:name", h.Avatar)
 	e.GET("/profile", h.Profile)
 	e.PUT("/setting/avatar", h.ProfileEditAvatar)
