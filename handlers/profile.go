@@ -59,7 +59,7 @@ func (h *Handler) ProfileEdit(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, "Unlogged user")
 	}
 
-	if err = c.Bind(&newProfile); err != nil {
+	if err = c.Bind(newProfile); err != nil {
 		return
 	}
 
