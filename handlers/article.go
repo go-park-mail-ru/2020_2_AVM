@@ -15,10 +15,10 @@ func (h *Handler) CreateArticle(c echo.Context) (err error) {
 		return
 	}
 
-	if login, ok := h.logInIds[cookie.Value]; err == http.ErrNoCookie || !ok {
+	if id, ok := h.logInIds[cookie.Value]; err == http.ErrNoCookie || !ok {
 		return c.JSON(http.StatusBadRequest, "Unlogined user")
 	} else {
-		art.Author = login
+		art.AuthorID = id
 	}
 
 	art.Id = strconv.Itoa(h.GetNewArcticleId())
@@ -32,7 +32,7 @@ func (h *Handler) ArticleByAuthor(c echo.Context) (err error) {
 	articles := []models.Article{}
 
 	for _, article := range h.Articles {
-		if article.Author == key {
+		if article.AuthorID == key {
 			articles = append(articles, article)
 		}
 	}

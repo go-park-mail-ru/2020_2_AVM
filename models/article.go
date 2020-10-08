@@ -6,6 +6,6 @@ type (
 		Title string `json:"Title"`
 		Desc string `json:"desc"`
 		Content string `json:"content"`
-		Author string `json:"author"`
+		AuthorID string `json:"author"`
 	}
 )

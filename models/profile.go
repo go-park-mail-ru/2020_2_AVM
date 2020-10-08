@@ -9,7 +9,7 @@ type (
 		Avatar   string `json:"avatar"`
 	}
 )
-func (p Profile) ConfirmChanges(profile Profile) ()  {
+func (p *Profile) ConfirmChanges(profile Profile) ()  {
 	if profile.Login != "" {
 		p.Login = profile.Login
 	}

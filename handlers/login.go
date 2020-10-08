@@ -16,17 +16,19 @@ func (h *Handler) Login(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, log)
 	}
 
+	userId := ""
 	password := ""
 
 	for _, profile := range h.Profiles {
 		if profile.Login == log.Login {
 			password = profile.Password
+			userId = profile.Id
 		}
 	}
 
 	if log.Password == password {
 		id := shortuuid.New()
-		h.logInIds[id] = log.Login
+		h.logInIds[id] = userId
 		cookie := http.Cookie{
 			Name:    "session_id",
 			Value: id,
