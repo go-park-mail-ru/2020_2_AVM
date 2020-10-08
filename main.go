@@ -14,7 +14,7 @@ func main() {
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowCredentials: true,
-		AllowOrigins: []string{"http://localhost:1323", "http://localhost:3000"},
+		AllowOrigins: []string{"http://localhost:1323", "http://localhost:8082"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, CSRFHeader},
 	}))
 
@@ -27,15 +27,15 @@ func main() {
 	// Routes
 	e.POST("/article", h.CreateArticle)
 
-	e.GET("/article/:author", h.ArticleByAuthor)
-	e.GET("/avatar/", h.AvatarDefault)
-	e.GET("/avatar/:name", h.Avatar)
-	e.GET("/profile", h.Profile)
-	e.PUT("/setting/avatar", h.ProfileEditAvatar)
-	e.PUT("/setting", h.ProfileEdit)
-	e.POST("/signup", h.Signup)
-	e.POST("/signin", h.Login)
-	e.POST("/logout", h.Logout)
+	e.GET("/api/article/:author", h.ArticleByAuthor)
+	e.GET("/api/avatar/", h.AvatarDefault)
+	e.GET("/api/avatar/:name", h.Avatar)
+	e.GET("/api/profile", h.Profile)
+	e.PUT("/api/setting/avatar", h.ProfileEditAvatar)
+	e.PUT("/api/setting", h.ProfileEdit)
+	e.POST("/api/signup", h.Signup)
+	e.POST("/api/signin", h.Login)
+	e.POST("/api/logout", h.Logout)
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
 }
