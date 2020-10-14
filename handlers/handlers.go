@@ -13,7 +13,7 @@ type (
 		articleId int
 	}
 )
-
+	
 func (h *Handler) GetNewUserId() (int) {
 	h.userId += 1
 	return h.userId
@@ -27,5 +27,3 @@ func (h *Handler) GetNewArcticleId() (int) {
 func NewHandler() (*Handler) {
 	return &Handler{nil, nil, map[string]string{}, 0, 0}
 }
-
-

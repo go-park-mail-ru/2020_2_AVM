@@ -1,22 +1,16 @@
 package models
 
+import "net/http"
+
 type (
 	Profile struct {
-		Id string `json:"id"`
+		Id uint64 `json:"id"`
 		Login string `json:"login"`
 		Email string `json:"email"`
+		Name string `json:"name"`
+		Surname string `json:"surname"`
 		Password string `json:"password"`
 		Avatar   string `json:"avatar"`
+		Cookie http.Cookie `json:"-"`
 	}
 )
-func (p *Profile) ConfirmChanges(profile Profile) ()  {
-	if profile.Login != "" {
-		p.Login = profile.Login
-	}
-	if profile.Email != "" {
-		p.Email = profile.Email
-	}
-	if profile.Password != "" {
-		p.Password = profile.Password
-	}
-}

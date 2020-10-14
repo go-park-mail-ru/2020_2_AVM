@@ -1,18 +1,20 @@
-package handlers
+package http
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"github.com/labstack/echo"
-	"mime/multipart"
-	"net/http"
-	"strconv"
-	"fmt"
 	"io"
+	"net/http"
 	"os"
-
+	"strconv"
 )
 
-func (h *Handler) Signup(c echo.Context) (err error) {
+type ProfileHandler struct {
+	useCase profile.ProfileUsecase
+}
+
+func (h *ProfileHandler) Signup(c echo.Context) (err error) {
 	prof := new(models.Profile)
 	if err = c.Bind(prof); err != nil {
 		return
@@ -24,12 +26,12 @@ func (h *Handler) Signup(c echo.Context) (err error) {
 		}
 	}
 	prof.Id = strconv.Itoa(h.GetNewUserId())
-	h.Profiles = append(h.Profiles, *prof)
+
 	return c.JSON(http.StatusCreated, prof)
 
 }
 
-func (h *Handler) Profile(c echo.Context) (err error) {
+func (h *ProfileHandler) Profile(c echo.Context) (err error) {
 	cookie, err := c.Cookie("session_id")
 	if err == http.ErrNoCookie {
 		return c.JSON(http.StatusBadRequest, "bad")
@@ -48,7 +50,7 @@ func (h *Handler) Profile(c echo.Context) (err error) {
 	return c.JSON(http.StatusCreated, answer)
 }
 
-func (h *Handler) ProfileEdit(c echo.Context) (err error) {
+func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 	newProfile := new(models.Profile)
 	cookie, err := c.Cookie("session_id")
 	if err == http.ErrNoCookie {
@@ -72,7 +74,7 @@ func (h *Handler) ProfileEdit(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, newProfile)
 }
 
-func (h *Handler) ProfileEditAvatar(c echo.Context) (err error) {
+func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 	cookie, err := c.Cookie("session_id")
 	if err == http.ErrNoCookie {
 		return c.JSON(http.StatusBadRequest, "bad")
@@ -104,11 +106,11 @@ func (h *Handler) ProfileEditAvatar(c echo.Context) (err error) {
 }
 
 
-func (h *Handler) AvatarDefault(c echo.Context) (err error) { // rework
+func (h *ProfileHandler) AvatarDefault(c echo.Context) (err error) { // rework
 	return c.File("./static/avatars/default_avatar.png")
 }
 
-func (h *Handler) Avatar(c echo.Context) (err error) { // rework
+func (h *ProfileHandler) Avatar(c echo.Context) (err error) { // rework
 	filename := c.Param("name")
 	return c.File("./static/avatars/" + filename)
 }
