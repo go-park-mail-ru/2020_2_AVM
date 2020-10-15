@@ -2,14 +2,7 @@ package repository
 
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
-	"github.com/labstack/echo"
-	"mime/multipart"
 	"net/http"
-	"strconv"
-	"fmt"
-	"io"
-	"os"
-	"sync"
 )
 
 type ProfileRepository struct {
@@ -43,13 +36,12 @@ func (t UnuniqueProfileData) Error() string {
 }
 
 func (r *ProfileRepository) CreateProfile( profile *models.Profile ) error {
-	profile.Id = strconv.Itoa(r.GetNewUserId())
 	for _, prof := range r.Profiles {
 		if prof.Login == profile.Login || prof.Email == profile.Email {
-			return nil
-		}
 			return UnuniqueProfileData{}
+		}
 	}
+	profile.Id = r.GetNewUserId()
 	r.Profiles = append(r.Profiles, *profile)
 
 	return nil

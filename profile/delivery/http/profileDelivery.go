@@ -30,7 +30,7 @@ func (h *ProfileHandler) Signup(c echo.Context) (err error) {
 	err = h.useCase.CreateProfile(prof)
 
 	if err != nil{
-		return c.JSON(http.StatusBadRequest, "error create profile")
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	return c.JSON(http.StatusCreated, prof)
@@ -45,7 +45,7 @@ func (h *ProfileHandler) Profile(c echo.Context) (err error) {
 
 	answer, err := h.useCase.GetProfileWithCookie(cookie)
 	if err != nil{
-		return c.JSON(http.StatusBadRequest, "cookie bad")
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	return c.JSON(http.StatusCreated, answer)
@@ -59,7 +59,7 @@ func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 	}
 	profile, err := h.useCase.GetProfileWithCookie(cookie)
 	if err != nil{
-		return c.JSON(http.StatusBadRequest, "Unlogged user")
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	if err = c.Bind(newProfile); err != nil {
@@ -69,7 +69,7 @@ func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 	err = h.useCase.UpdateProfile(profile, newProfile)
 
 	if err != nil{
-		return c.JSON(http.StatusBadRequest, "error update profile")
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	return c.JSON(http.StatusOK, newProfile)

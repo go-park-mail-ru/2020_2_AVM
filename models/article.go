@@ -2,10 +2,10 @@ package models
 
 type (
 	Article struct {
-		Id      string `json:"Id"`
+		Id	uint64 `json:"Id"`
 		Title string `json:"Title"`
 		Desc string `json:"desc"`
 		Content string `json:"content"`
-		AuthorID string `json:"author"`
+		AuthorID uint64 `json:"author"`
 	}
 )
