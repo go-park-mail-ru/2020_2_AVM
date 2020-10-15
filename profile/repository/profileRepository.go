@@ -15,7 +15,20 @@ import (
 type ProfileRepository struct {
 	Profiles []models.Profile
 	logInIds map[string]string
+	userId int
 }
+
+
+func (r *ProfileRepository) GetNewUserId() (int) {
+	r.userId += 1
+	return r.userId
+}
+
+
+func NewHandler() (*ProfileRepository) {
+	return &ProfileRepository{nil, map[string]string{}, 0}
+}
+
 
 type ProfileNotFound struct{}
 
@@ -30,7 +43,7 @@ func (t UnuniqueProfileData) Error() string {
 }
 
 func (r *ProfileRepository) CreateProfile( profile *models.Profile ) error {
-
+	profile.Id = strconv.Itoa(r.GetNewUserId())
 	for _, prof := range r.Profiles {
 		if prof.Login == profile.Login || prof.Email == profile.Email {
 			return nil
@@ -63,31 +76,31 @@ func (r *ProfileRepository) GetProfile( login *string ) ( *models.Profile, error
 	return nil, ProfileNotFound{}
 }
 
-func (r *ProfileRepository) UpdateProfile( profile *models.Profile, name, surname, login, email, password, avatarPath string ) error {
+func (r *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *models.Profile) error {
 	if _, err := r.GetProfile(&profile.Login); err != nil {
 		return ProfileNotFound{}
 	}
 
-	if login != "" {
-		profile.Login = login
+	if profileNew.Login != "" {
+		profile.Login = profileNew.Login
 	}
-	if email != "" {
-		profile.Email = email
+	if profileNew.Email != "" {
+		profile.Email = profileNew.Email
 	}
-	if password != "" {
-		profile.Password = password
-	}
-
-	if avatarPath != "" {
-		profile.Avatar = avatarPath
+	if profileNew.Password != "" {
+		profile.Password = profileNew.Password
 	}
 
-	if name != "" {
-		profile.Name = name
+	if profileNew.Avatar != "" {
+		profile.Avatar = profileNew.Avatar
 	}
 
-	if surname != "" {
-		profile.Surname = surname
+	if profileNew.Name != "" {
+		profile.Name = profileNew.Name
+	}
+
+	if profileNew.Surname != "" {
+		profile.Surname = profileNew.Surname
 	}
 
 

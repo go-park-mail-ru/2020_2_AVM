@@ -9,6 +9,6 @@ type ProfileRepository interface {
 	CreateProfile( profile *models.Profile ) error
 	DeleteProfile( profile *models.Profile ) error
 	GetProfile( login *string ) ( *models.Profile, error )
-	UpdateProfile( profile *models.Profile, name, surname, avatarPath string ) error
+	UpdateProfile( profile *models.Profile, profileNew *models.Profile ) error
 	GetProfileWithCookie(cookie *http.Cookie) ( *models.Profile, error )
 }

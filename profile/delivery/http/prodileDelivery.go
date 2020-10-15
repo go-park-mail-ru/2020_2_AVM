@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"github.com/labstack/echo"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
@@ -14,18 +15,23 @@ type ProfileHandler struct {
 	useCase profile.ProfileUsecase
 }
 
+func NewProfileHandler (useCase profile.ProfileUseCase) *ProfileHandler {
+	return &ProfileHandler{
+		useCase: useCase,
+	}
+}
+
 func (h *ProfileHandler) Signup(c echo.Context) (err error) {
 	prof := new(models.Profile)
 	if err = c.Bind(prof); err != nil {
 		return
 	}
 
-	for _, profile := range h.Profiles {
-		if profile.Login == prof.Login || profile.Email == profile.Email {
-			return c.JSON(http.StatusBadRequest, "Ununique data")
-		}
+	err = h.useCase.CreateProfile(prof)
+
+	if err != nil{
+		return c.JSON(http.StatusBadRequest, "error create profile")
 	}
-	prof.Id = strconv.Itoa(h.GetNewUserId())
 
 	return c.JSON(http.StatusCreated, prof)
 
@@ -36,15 +42,10 @@ func (h *ProfileHandler) Profile(c echo.Context) (err error) {
 	if err == http.ErrNoCookie {
 		return c.JSON(http.StatusBadRequest, "bad")
 	}
-	userId, ok := h.logInIds[cookie.Value]
-	if !ok {
-		return c.JSON(http.StatusBadRequest, "Unlogged user")
-	}
-	answer := new(models.Profile)
-	for _, profile := range h.Profiles {
-		if profile.Id == userId {
-			*answer = profile
-		}
+
+	answer, err := h.useCase.GetProfileWithCookie(cookie)
+	if err != nil{
+		return c.JSON(http.StatusBadRequest, "cookie bad")
 	}
 
 	return c.JSON(http.StatusCreated, answer)
@@ -56,8 +57,8 @@ func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 	if err == http.ErrNoCookie {
 		return c.JSON(http.StatusBadRequest, "bad")
 	}
-	userId, ok := h.logInIds[cookie.Value]
-	if !ok {
+	profile, err := h.useCase.GetProfileWithCookie(cookie)
+	if err != nil{
 		return c.JSON(http.StatusBadRequest, "Unlogged user")
 	}
 
@@ -65,10 +66,10 @@ func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 		return
 	}
 
-	for i, profile := range h.Profiles {
-		if profile.Id == userId {
-			h.Profiles[i].ConfirmChanges(*newProfile)
-		}
+	err = h.useCase.UpdateProfile(profile, newProfile)
+
+	if err != nil{
+		return c.JSON(http.StatusBadRequest, "error update profile")
 	}
 
 	return c.JSON(http.StatusOK, newProfile)
@@ -115,7 +116,7 @@ func (h *ProfileHandler) Avatar(c echo.Context) (err error) { // rework
 	return c.File("./static/avatars/" + filename)
 }
 
-func (h *Handler) UploadAvatar(file *multipart.FileHeader, userID int) (err error, filename string) {
+func (h *ProfileHandler) UploadAvatar(file *multipart.FileHeader, userID int) (err error, filename string) {
 	src, err := file.Open()
 	if err != nil {
 		fmt.Println(err)
