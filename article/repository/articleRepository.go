@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
+
 )
 
 type ArticleRepository struct {
@@ -38,7 +39,7 @@ func (r *ArticleRepository) CreateArticle( article *models.Article ) error {
 			return UnuniqueArticle{}
 		}
 	}
-	article.Id = r.GetNewArcticleId()
+	article.Id = uint64(r.GetNewArcticleId())
 	r.Atricles = append(r.Atricles, *article)
 
 	return nil

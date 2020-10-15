@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
+	"github.com/go-park-mail-ru/2020_2_AVM/profile"
 	"github.com/labstack/echo"
 	"io"
 	"mime/multipart"
@@ -15,7 +16,7 @@ type ProfileHandler struct {
 	useCase profile.ProfileUsecase
 }
 
-func NewProfileHandler (useCase profile.ProfileUseCase) *ProfileHandler {
+func NewProfileHandler (useCase profile.ProfileUsecase) *ProfileHandler {
 	return &ProfileHandler{
 		useCase: useCase,
 	}
@@ -74,29 +75,29 @@ func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 
 	return c.JSON(http.StatusOK, newProfile)
 }
-
+/*
 func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 	cookie, err := c.Cookie("session_id")
 	if err == http.ErrNoCookie {
 		return c.JSON(http.StatusBadRequest, "bad")
 	}
-	userId, ok :=  h.logInIds[cookie.Value]
-	if !ok {
-		return c.JSON(http.StatusBadRequest, "Unlogged user")
+	prof, err :=  h.useCase.GetProfileWithCookie(cookie)
+	if err != nil{
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "bad")
 	} else {
-		userIdInt, _ := strconv.Atoi(userId)
+		userIdInt := int(prof.Id)
 
 		err, filename := h.UploadAvatar(file, userIdInt)
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			for i, profile := range h.Profiles {
-				if profile.Id == userId {
+			for i, profile := range h.us {
+				if profile.Id == userIdInt {
 					h.Profiles[i].Avatar = filename
 				}
 			}
@@ -104,7 +105,7 @@ func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 	}
 
 	return c.JSON(http.StatusOK, "OK")
-}
+}*/
 
 
 func (h *ProfileHandler) AvatarDefault(c echo.Context) (err error) { // rework

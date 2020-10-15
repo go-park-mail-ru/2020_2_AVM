@@ -1,7 +1,9 @@
 package main
 
 import (
-	"github.com/go-park-mail-ru/2020_2_AVM/handlers"
+	"github.com/go-park-mail-ru/2020_2_AVM/models"
+	"github.com/go-park-mail-ru/2020_2_AVM/profile"
+	"github.com/go-park-mail-ru/2020_2_AVM/article"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/labstack/echo"
@@ -23,7 +25,8 @@ func main() {
 	e.Use(middleware.Logger())
 
 	// Initialize handler
-	h := handlers.NewHandler()
+	ph := handlers.NewHandler()
+	ah: = article.
 	// Routes
 	e.POST("/article", h.CreateArticle)
 

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
+	"github.com/go-park-mail-ru/2020_2_AVM/article"
 )
 
 type ArticleUseCase struct {

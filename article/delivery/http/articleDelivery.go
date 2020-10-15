@@ -2,8 +2,9 @@ package http
 
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
-	"github.com/go-park-mail-ru/2020_2_AVM/prodile"
+	"github.com/go-park-mail-ru/2020_2_AVM/profile"
 	"github.com/go-park-mail-ru/2020_2_AVM/article"
+	"strconv"
 
 	"github.com/labstack/echo"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 
 type ArticleHandler struct {
 	useCase article.ArticleUsecase
+	profileRepository profile.ProfileRepository
 }
 
 func NewAricleHandler (useCase article.ArticleUsecase) *ArticleHandler {
@@ -28,12 +30,12 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 		return
 	}
 
-	if id, ok := h.useCase.GetProfileWithCookie(cookie); err == http.ErrNoCookie || !ok {
-		return c.JSON(http.StatusBadRequest, "Unlogined user")
+	if prof, err := h.profileRepository.GetProfileWithCookie(cookie); err !=nil {
+		return c.JSON(http.StatusBadRequest, err)
 	} else {
-		art.AuthorID = id
+		art.AuthorID = prof.Id
 	}
-	err = h.useCase.CreateAticle(art)
+	err = h.useCase.CreateArticle(art)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
@@ -42,7 +44,8 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 
 func (h *ArticleHandler) ArticleByAuthor(c echo.Context) (err error) {
 	key := c.Param("author")
-	articles, err := h.useCase.GetArticlesByAuthorId(key)
+	id, _ := strconv.Atoi(key)
+	articles, err := h.useCase.GetArticlesByAuthorId(uint64(id))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}

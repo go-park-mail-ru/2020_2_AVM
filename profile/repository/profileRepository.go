@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"net/http"
+	"strconv"
 )
 
 type ProfileRepository struct {
@@ -41,7 +42,7 @@ func (r *ProfileRepository) CreateProfile( profile *models.Profile ) error {
 			return UnuniqueProfileData{}
 		}
 	}
-	profile.Id = r.GetNewUserId()
+	profile.Id = uint64(r.GetNewUserId())
 	r.Profiles = append(r.Profiles, *profile)
 
 	return nil
@@ -95,11 +96,13 @@ func (r *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *
 		profile.Surname = profileNew.Surname
 	}
 
-
+	return nil
 }
+
 func (r *ProfileRepository) GetProfileWithCookie(cookie *http.Cookie) ( *models.Profile, error ) {
 	for _, prof := range r.Profiles {
-		if prof.Id == r.logInIds[cookie.Value] {
+		id, _ := strconv.Atoi(r.logInIds[cookie.Value])
+		if prof.Id == uint64(id) {
 			return &prof, nil
 		}
 	}
