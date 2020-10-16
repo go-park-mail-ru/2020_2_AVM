@@ -3,12 +3,10 @@ package repository
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"net/http"
-	"strconv"
 )
 
 type ProfileRepository struct {
 	Profiles []models.Profile
-	logInIds map[string]string
 	userId int
 }
 func NewProfileRepository() *ProfileRepository {
@@ -26,7 +24,7 @@ func (r *ProfileRepository) GetNewUserId() (int) {
 
 
 func NewHandler() (*ProfileRepository) {
-	return &ProfileRepository{nil, map[string]string{}, 0}
+	return &ProfileRepository{nil,  0}
 }
 
 
@@ -105,10 +103,10 @@ func (r *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *
 }
 
 func (r *ProfileRepository) GetProfileWithCookie(cookie *http.Cookie) ( *models.Profile, error ) {
-	id, _ := strconv.Atoi(r.logInIds[cookie.Value])
 	for _, prof := range r.Profiles {
-		if prof.Id == uint64(id) {
+		if prof.Cookie.Value == cookie.Value {
 			return &prof, nil
+
 		}
 	}
 
@@ -116,6 +114,11 @@ func (r *ProfileRepository) GetProfileWithCookie(cookie *http.Cookie) ( *models.
 }
 
 func (r *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie *http.Cookie) error {
-	profile.Cookie = *cookie
+	for i, prof := range r.Profiles {
+		if prof.Id == profile.Id {
+			r.Profiles[i].Cookie = * cookie
+			return nil
+		}
+	}
 	return nil
 }

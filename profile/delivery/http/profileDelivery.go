@@ -16,12 +16,11 @@ import (
 
 type ProfileHandler struct {
 	useCase profile.ProfileUsecase
-	profileRepository profile.ProfileRepository
 }
 
-func NewProfileHandler (useCase profile.ProfileUsecase) *ProfileHandler {
+func NewProfileHandler (uC profile.ProfileUsecase) *ProfileHandler {
 	return &ProfileHandler{
-		useCase: useCase,
+		useCase: uC,
 	}
 }
 
@@ -138,7 +137,7 @@ func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 	} else {
 		userIdInt := int(prof.Id)
 
-		err, _ := h.UploadAvatar(file, userIdInt)
+		err, filename := h.UploadAvatar(file, userIdInt)
 		if err != nil {
 			fmt.Println(err)
 		} else {

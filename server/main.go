@@ -27,7 +27,7 @@ func configureAPI() *ServerStruct{
 	artUseCase := articleUseCase.NewArticleUseCase(artRepository)
 	profUseCase := profileUseCase.NewProfileUseCase(profRepository)
 
-	artHandler := articleDelivery.NewAricleHandler(artUseCase)
+	artHandler := articleDelivery.NewAricleHandler(artUseCase, profUseCase)
 	profHandler := profileDelivery.NewProfileHandler(profUseCase)
 
 	return &ServerStruct{
@@ -63,7 +63,7 @@ func main() {
 	e.PUT("/setting/avatar", serverConfig.profileHandler.ProfileEditAvatar)
 	e.PUT("/setting", serverConfig.profileHandler.ProfileEdit)
 	e.POST("/signup", serverConfig.profileHandler.Signup)
-//	e.POST("/signin", h.Login)
+	e.POST("/signin", serverConfig.profileHandler.Signin)
 //	e.POST("/logout", h.Logout)
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
