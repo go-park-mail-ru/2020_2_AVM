@@ -16,6 +16,7 @@ import (
 
 type ProfileHandler struct {
 	useCase profile.ProfileUsecase
+	profileRepository profile.ProfileRepository
 }
 
 func NewProfileHandler (useCase profile.ProfileUsecase) *ProfileHandler {
@@ -137,7 +138,7 @@ func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 	} else {
 		userIdInt := int(prof.Id)
 
-		err, filename := h.UploadAvatar(file, userIdInt)
+		err, _ := h.UploadAvatar(file, userIdInt)
 		if err != nil {
 			fmt.Println(err)
 		} else {
