@@ -1,16 +1,44 @@
 package main
 
 import (
-	"github.com/go-park-mail-ru/2020_2_AVM/models"
-	"github.com/go-park-mail-ru/2020_2_AVM/profile"
-	"github.com/go-park-mail-ru/2020_2_AVM/article"
+	articleDelivery "github.com/go-park-mail-ru/2020_2_AVM/article/delivery/http"
+	articleRepository "github.com/go-park-mail-ru/2020_2_AVM/article/repository"
+	articleUseCase "github.com/go-park-mail-ru/2020_2_AVM/article/usecase"
+	profileDelivery "github.com/go-park-mail-ru/2020_2_AVM/profile/delivery/http"
+	profileRepository "github.com/go-park-mail-ru/2020_2_AVM/profile/repository"
+	profileUseCase "github.com/go-park-mail-ru/2020_2_AVM/profile/usecase"
+	"net/http"
+
+	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
-	"github.com/labstack/echo"
 )
+
+type ServerStruct struct{
+	ArticleHandler *articleDelivery.ArticleHandler
+	profileHandler *profileDelivery.ProfileHandler
+	httpServer *http.Server
+}
+
+func configureAPI() *ServerStruct{
+	artRepository := articleRepository.NewAricleRepository()
+	profRepository := profileRepository.NewProfileRepository()
+
+	artUseCase := articleUseCase.NewArticleUseCase(artRepository)
+	profUseCase := profileUseCase.NewProfileUseCase(profRepository)
+
+	artHandler := articleDelivery.NewAricleHandler(artUseCase)
+	profHandler := profileDelivery.NewProfileHandler(profUseCase)
+
+	return &ServerStruct{
+		ArticleHandler: artHandler,
+		profileHandler: profHandler,
+	}
+}
 
 func main() {
 	e := echo.New()
+	serverConfig := configureAPI()
 
 	CSRFHeader := "X-CSRF-TOKEN"
 
@@ -24,21 +52,19 @@ func main() {
 	e.Logger.SetLevel(log.DEBUG)
 	e.Use(middleware.Logger())
 
-	// Initialize handler
-	ph := handlers.NewHandler()
-	ah: = article.
-	// Routes
-	e.POST("/article", h.CreateArticle)
 
-	e.GET("/article/:author", h.ArticleByAuthor)
-	e.GET("/avatar", h.AvatarDefault)
-	e.GET("/avatar/:name", h.Avatar)
-	e.GET("/profile", h.Profile)
-	e.PUT("/setting/avatar", h.ProfileEditAvatar)
-	e.PUT("/setting", h.ProfileEdit)
-	e.POST("/signup", h.Signup)
-	e.POST("/signin", h.Login)
-	e.POST("/logout", h.Logout)
+	// Routes
+	e.POST("/article", serverConfig.ArticleHandler.CreateArticle)
+
+	e.GET("/article/:author", serverConfig.ArticleHandler.ArticleByAuthor)
+	e.GET("/avatar", serverConfig.profileHandler.AvatarDefault)
+	e.GET("/avatar/:name", serverConfig.profileHandler.Avatar)
+	e.GET("/profile", serverConfig.profileHandler.Profile)
+	e.PUT("/setting/avatar", serverConfig.profileHandler.ProfileEditAvatar)
+	e.PUT("/setting", serverConfig.profileHandler.ProfileEdit)
+	e.POST("/signup", serverConfig.profileHandler.Signup)
+//	e.POST("/signin", h.Login)
+//	e.POST("/logout", h.Logout)
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
 }

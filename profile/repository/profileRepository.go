@@ -11,6 +11,12 @@ type ProfileRepository struct {
 	logInIds map[string]string
 	userId int
 }
+func NewProfileRepository() *ProfileRepository {
+	return &ProfileRepository{
+		Profiles: []models.Profile{},
+		userId: 0,
+	}
+}
 
 
 func (r *ProfileRepository) GetNewUserId() (int) {

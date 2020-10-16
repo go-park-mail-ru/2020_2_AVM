@@ -9,7 +9,12 @@ type ArticleRepository struct {
 	Atricles []models.Article
 	articleId int
 }
-
+func NewAricleRepository() *ArticleRepository {
+	return &ArticleRepository{
+		Atricles: []models.Article{},
+		articleId: 0,
+	}
+}
 func (r *ArticleRepository) GetNewArcticleId() (int) {
 	r.articleId += 1
 	return r.articleId
