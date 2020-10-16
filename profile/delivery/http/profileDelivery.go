@@ -41,7 +41,6 @@ func (h *ProfileHandler) Signup(c echo.Context) (err error) {
 }
 
 func (h *ProfileHandler) Signin(c echo.Context) (err error) {
-
 	prof := new(models.Profile)
 	expiration := time.Now().Add(8 * time.Hour)
 	if err = c.Bind(prof); err != nil{
@@ -133,7 +132,7 @@ func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 
 	file, err := c.FormFile("avatar")
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "bad")
+		return c.JSON(http.StatusBadRequest, err)
 	} else {
 		userIdInt := int(prof.Id)
 

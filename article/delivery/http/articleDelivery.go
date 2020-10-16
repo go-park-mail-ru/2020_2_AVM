@@ -27,7 +27,7 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 
 	cookie, err := c.Cookie("session_id")
 	if err = c.Bind(art); err != nil || cookie == nil {
-		return
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	if prof, err := h.useCaseProf.GetProfileWithCookie(cookie); err !=nil {

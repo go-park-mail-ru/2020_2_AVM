@@ -9,6 +9,7 @@ type ProfileRepository struct {
 	Profiles []models.Profile
 	userId int
 }
+
 func NewProfileRepository() *ProfileRepository {
 	return &ProfileRepository{
 		Profiles: []models.Profile{},
@@ -77,27 +78,33 @@ func (r *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *
 		return ProfileNotFound{}
 	}
 
-	if profileNew.Login != "" {
-		profile.Login = profileNew.Login
-	}
-	if profileNew.Email != "" {
-		profile.Email = profileNew.Email
-	}
-	if profileNew.Password != "" {
-		profile.Password = profileNew.Password
+	for i, prof := range r.Profiles {
+		if prof.Id == profile.Id {
+			if profileNew.Login != "" {
+				r.Profiles[i].Login = profileNew.Login
+			}
+			if profileNew.Email != "" {
+				r.Profiles[i].Email = profileNew.Email
+			}
+			if profileNew.Password != "" {
+				r.Profiles[i].Password = profileNew.Password
+			}
+
+			if profileNew.Avatar != "" {
+				r.Profiles[i].Avatar = profileNew.Avatar
+			}
+
+			if profileNew.Name != "" {
+				r.Profiles[i].Name = profileNew.Name
+			}
+
+			if profileNew.Surname != "" {
+				r.Profiles[i].Surname = profileNew.Surname
+			}
+			return nil
+		}
 	}
 
-	if profileNew.Avatar != "" {
-		profile.Avatar = profileNew.Avatar
-	}
-
-	if profileNew.Name != "" {
-		profile.Name = profileNew.Name
-	}
-
-	if profileNew.Surname != "" {
-		profile.Surname = profileNew.Surname
-	}
 
 	return nil
 }

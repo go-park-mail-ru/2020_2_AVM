@@ -56,9 +56,9 @@ func main() {
 	// Routes
 	e.POST("/article", serverConfig.ArticleHandler.CreateArticle)
 
-	e.GET("/article/:author", serverConfig.ArticleHandler.ArticleByAuthor)
+	e.GET("/article/author/:author", serverConfig.ArticleHandler.ArticleByAuthor)
 	e.GET("/avatar", serverConfig.profileHandler.AvatarDefault)
-	e.GET("/avatar/:name", serverConfig.profileHandler.Avatar)
+	e.GET("/avatar/title/:name", serverConfig.profileHandler.Avatar)
 	e.GET("/profile", serverConfig.profileHandler.Profile)
 	e.PUT("/setting/avatar", serverConfig.profileHandler.ProfileEditAvatar)
 	e.PUT("/setting", serverConfig.profileHandler.ProfileEdit)
