@@ -10,5 +10,7 @@ type ProfileUsecase interface {
 	DeleteProfile( profile *models.Profile ) error
 	GetProfile( login *string ) ( *models.Profile, error )
 	UpdateProfile( profile *models.Profile, profileNew *models.Profile) error
+	ProfileAvatarUpdate ( profile *models.Profile, avatarPath *string) error
+	SetCookieToProfile (profile *models.Profile, cookie *http.Cookie) error
 	GetProfileWithCookie(cookie *http.Cookie) ( *models.Profile, error )
 }

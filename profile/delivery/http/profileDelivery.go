@@ -5,11 +5,13 @@ import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"github.com/go-park-mail-ru/2020_2_AVM/profile"
 	"github.com/labstack/echo"
+	"github.com/lithammer/shortuuid"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 type ProfileHandler struct {
@@ -30,7 +32,7 @@ func (h *ProfileHandler) Signup(c echo.Context) (err error) {
 
 	err = h.useCase.CreateProfile(prof)
 
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -38,6 +40,49 @@ func (h *ProfileHandler) Signup(c echo.Context) (err error) {
 
 }
 
+func (h *ProfileHandler) Signin(c echo.Context) (err error) {
+
+	prof := new(models.Profile)
+	expiration := time.Now().Add(8 * time.Hour)
+	if err = c.Bind(prof); err != nil{
+		return c.JSON(http.StatusBadRequest, prof)
+	}
+
+	baseProfile, err  := h.useCase.GetProfile(&prof.Login)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	if prof.Password == baseProfile.Password {
+		id := shortuuid.New()
+		cookie := http.Cookie{
+			Name:    "session_id",
+			Value: id,
+			Expires: expiration,
+			HttpOnly: true,
+		}
+		c.SetCookie(&cookie)
+		h.useCase.SetCookieToProfile(baseProfile, &cookie)
+	} else {
+		return c.JSON(http.StatusBadRequest, "Wrong password")
+	}
+
+	return c.JSON(http.StatusOK, prof)
+}
+/*
+func (h *ProfileHandler) Logout(c echo.Context) (err error) {
+	cookie, err := c.Cookie("session_id")
+	if err == http.ErrNoCookie {
+		return c.JSON(http.StatusBadRequest, "bad")
+	}
+
+	cookie.Expires = time.Now().AddDate(0, 0, -1)
+	delete(h.logInIds, cookie.Value)
+	c.SetCookie(cookie)
+
+	return c.JSON(http.StatusOK, "ok")
+}
+*/
 func (h *ProfileHandler) Profile(c echo.Context) (err error) {
 	cookie, err := c.Cookie("session_id")
 	if err == http.ErrNoCookie {
@@ -75,11 +120,11 @@ func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 
 	return c.JSON(http.StatusOK, newProfile)
 }
-/*
+
 func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 	cookie, err := c.Cookie("session_id")
 	if err == http.ErrNoCookie {
-		return c.JSON(http.StatusBadRequest, "bad")
+		return c.JSON(http.StatusBadRequest, err)
 	}
 	prof, err :=  h.useCase.GetProfileWithCookie(cookie)
 	if err != nil{
@@ -96,16 +141,12 @@ func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			for i, profile := range h.us {
-				if profile.Id == userIdInt {
-					h.Profiles[i].Avatar = filename
-				}
-			}
+			h.useCase.ProfileAvatarUpdate(prof, &filename)
 		}
 	}
 
 	return c.JSON(http.StatusOK, "OK")
-}*/
+}
 
 
 func (h *ProfileHandler) AvatarDefault(c echo.Context) (err error) { // rework

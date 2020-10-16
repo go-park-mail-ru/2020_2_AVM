@@ -59,13 +59,12 @@ func (r *ProfileRepository) DeleteProfile( profile *models.Profile ) error {
 }
 
 func (r *ProfileRepository) GetProfile( login *string ) ( *models.Profile, error ) {
-
-
 	for _, prof := range r.Profiles {
 		if prof.Login == *login {
 			return &prof, nil
 		}
 	}
+
 	return nil, ProfileNotFound{}
 }
 
@@ -100,12 +99,17 @@ func (r *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *
 }
 
 func (r *ProfileRepository) GetProfileWithCookie(cookie *http.Cookie) ( *models.Profile, error ) {
+	id, _ := strconv.Atoi(r.logInIds[cookie.Value])
 	for _, prof := range r.Profiles {
-		id, _ := strconv.Atoi(r.logInIds[cookie.Value])
 		if prof.Id == uint64(id) {
 			return &prof, nil
 		}
 	}
 
 	return nil, ProfileNotFound{}
+}
+
+func (r *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie *http.Cookie) error {
+	profile.Cookie = *cookie
+	return nil
 }

@@ -40,3 +40,12 @@ func (h *ProfileUseCase) GetProfileWithCookie(cookie *http.Cookie)( *models.Prof
 func (h *ProfileUseCase) UpdateProfile( profile *models.Profile, profileNew *models.Profile) error {
 	return h.DBConn.UpdateProfile(profile, profileNew)
 }
+func (h *ProfileUseCase) ProfileAvatarUpdate ( profile *models.Profile, avatarPath *string) error {
+	prof := new(models.Profile)
+	prof.Avatar = *avatarPath
+	return h.DBConn.UpdateProfile(profile, prof)
+}
+
+func (h *ProfileUseCase) SetCookieToProfile (profile *models.Profile, cookie *http.Cookie) error {
+	return h.DBConn.SetCookieToProfile(profile, cookie)
+}
