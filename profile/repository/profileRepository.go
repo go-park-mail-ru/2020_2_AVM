@@ -127,5 +127,5 @@ func (r *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie 
 			return nil
 		}
 	}
-	return nil
+	return ProfileNotFound{}
 }

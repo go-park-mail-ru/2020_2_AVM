@@ -83,7 +83,7 @@ func (h *ProfileHandler) Logout(c echo.Context) (err error) {
 	h.useCase.SetCookieToProfile(prof, emptyCookie)
 	c.SetCookie(cookie)
 
-	return c.JSON(http.StatusOK, "ok")
+	return c.JSON(http.StatusOK, "okk")
 }
 
 func (h *ProfileHandler) Profile(c echo.Context) (err error) {
