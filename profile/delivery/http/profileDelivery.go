@@ -68,20 +68,24 @@ func (h *ProfileHandler) Signin(c echo.Context) (err error) {
 
 	return c.JSON(http.StatusOK, prof)
 }
-/*
+
 func (h *ProfileHandler) Logout(c echo.Context) (err error) {
 	cookie, err := c.Cookie("session_id")
-	if err == http.ErrNoCookie {
-		return c.JSON(http.StatusBadRequest, "bad")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
 	}
-
+	prof, err := h.useCase.GetProfileWithCookie(cookie)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
 	cookie.Expires = time.Now().AddDate(0, 0, -1)
-	delete(h.logInIds, cookie.Value)
+	emptyCookie := new(http.Cookie)
+	h.useCase.SetCookieToProfile(prof, emptyCookie)
 	c.SetCookie(cookie)
 
 	return c.JSON(http.StatusOK, "ok")
 }
-*/
+
 func (h *ProfileHandler) Profile(c echo.Context) (err error) {
 	cookie, err := c.Cookie("session_id")
 	if err == http.ErrNoCookie {

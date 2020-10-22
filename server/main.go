@@ -64,7 +64,7 @@ func main() {
 	e.PUT("/setting", serverConfig.profileHandler.ProfileEdit)
 	e.POST("/signup", serverConfig.profileHandler.Signup)
 	e.POST("/signin", serverConfig.profileHandler.Signin)
-//	e.POST("/logout", h.Logout)
+	e.POST("/logout", serverConfig.profileHandler.Logout)
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
 }
