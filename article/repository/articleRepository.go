@@ -80,7 +80,8 @@ func (r *ArticleRepository) GetArticlesByAuthorId( authorId uint64 ) ( []*models
 
 	for _, art := range r.Atricles {
 		if art.AuthorID == authorId {
-			result = append(result, &art)
+			buff := art
+			result = append(result, &buff)
 		}
 	}
 	if len(result) == 0 {
