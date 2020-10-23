@@ -44,7 +44,7 @@ func main() {
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowCredentials: true,
-		AllowOrigins: []string{"http://localhost:1323", "http://localhost:3000"},
+		AllowOrigins: []string{"http://localhost:1323", "http://localhost:3000", "http://95.163.250.127:8080"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, CSRFHeader},
 	}))
 
@@ -54,17 +54,17 @@ func main() {
 
 
 	// Routes
-	e.POST("/article", serverConfig.ArticleHandler.CreateArticle)
+	e.POST("/api/article", serverConfig.ArticleHandler.CreateArticle)
 
-	e.GET("/article/author/:author", serverConfig.ArticleHandler.ArticleByAuthor)
-	e.GET("/avatar", serverConfig.profileHandler.AvatarDefault)
-	e.GET("/avatar/title/:name", serverConfig.profileHandler.Avatar)
-	e.GET("/profile", serverConfig.profileHandler.Profile)
-	e.PUT("/setting/avatar", serverConfig.profileHandler.ProfileEditAvatar)
-	e.PUT("/setting", serverConfig.profileHandler.ProfileEdit)
-	e.POST("/signup", serverConfig.profileHandler.Signup)
-	e.POST("/signin", serverConfig.profileHandler.Signin)
-	e.POST("/logout", serverConfig.profileHandler.Logout)
+	e.GET("/api/article/author/:author", serverConfig.ArticleHandler.ArticleByAuthor)
+	e.GET("/api/avatar", serverConfig.profileHandler.AvatarDefault)
+	e.GET("/api/avatar/title/:name", serverConfig.profileHandler.Avatar)
+	e.GET("/api/profile", serverConfig.profileHandler.Profile)
+	e.PUT("/api/setting/avatar", serverConfig.profileHandler.ProfileEditAvatar)
+	e.PUT("/api/setting", serverConfig.profileHandler.ProfileEdit)
+	e.POST("/api/signup", serverConfig.profileHandler.Signup)
+	e.POST("/api/signin", serverConfig.profileHandler.Signin)
+	e.POST("/api/logout", serverConfig.profileHandler.Logout)
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
 }
