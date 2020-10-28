@@ -1,12 +1,16 @@
 package main
 
 import (
+	model "github.com/go-park-mail-ru/2020_2_AVM/models"
 	articleDelivery "github.com/go-park-mail-ru/2020_2_AVM/article/delivery/http"
 	articleRepository "github.com/go-park-mail-ru/2020_2_AVM/article/repository"
 	articleUseCase "github.com/go-park-mail-ru/2020_2_AVM/article/usecase"
 	profileDelivery "github.com/go-park-mail-ru/2020_2_AVM/profile/delivery/http"
 	profileRepository "github.com/go-park-mail-ru/2020_2_AVM/profile/repository"
 	profileUseCase "github.com/go-park-mail-ru/2020_2_AVM/profile/usecase"
+
+	"gorm.io/gorm"
+	"gorm.io/driver/postgres"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -21,8 +25,15 @@ type ServerStruct struct{
 }
 
 func configureAPI() *ServerStruct{
+	db, err := gorm.Open(postgres.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+	db.AutoMigrate(&profileRepository.ProfileRepository{})
+	db.Migrator().CreateTable(&model.Profile{Id:0, Login:"", Email:"", Name:"", Surname:"", Password:"", Avatar:""})
+
 	artRepository := articleRepository.NewAricleRepository()
-	profRepository := profileRepository.NewProfileRepository()
+	profRepository := profileRepository.NewProfileRepository(*db)
 
 	artUseCase := articleUseCase.NewArticleUseCase(artRepository)
 	profUseCase := profileUseCase.NewProfileUseCase(profRepository)

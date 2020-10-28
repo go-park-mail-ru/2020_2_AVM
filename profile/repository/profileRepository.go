@@ -2,32 +2,16 @@ package repository
 
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
+	"gorm.io/gorm"
 	"net/http"
 )
 
 type ProfileRepository struct {
-	Profiles []models.Profile
-	userId int
+	conn   *gorm.DB
 }
-
-func NewProfileRepository() *ProfileRepository {
-	return &ProfileRepository{
-		Profiles: []models.Profile{},
-		userId: 0,
-	}
+func NewProfileDatabase(db *gorm.DB) *ProfileRepository {
+	return &ProfileRepository{conn: db}
 }
-
-
-func (r *ProfileRepository) GetNewUserId() (int) {
-	r.userId += 1
-	return r.userId
-}
-
-
-func NewHandler() (*ProfileRepository) {
-	return &ProfileRepository{nil,  0}
-}
-
 
 type ProfileNotFound struct{}
 
@@ -41,91 +25,66 @@ func (t UnuniqueProfileData) Error() string {
 	return "Profile already exists!"
 }
 
-func (r *ProfileRepository) CreateProfile( profile *models.Profile ) error {
-	for _, prof := range r.Profiles {
-		if prof.Login == profile.Login || prof.Email == profile.Email {
-			return UnuniqueProfileData{}
-		}
-	}
-	profile.Id = uint64(r.GetNewUserId())
-	r.Profiles = append(r.Profiles, *profile)
 
-	return nil
+func (udb *ProfileRepository) CreateProfile(profile *models.Profile) (err error) {
+	return udb.conn.Table("profile_repositories").Create(profile).Error
+}
+func (udb *ProfileRepository) DeleteProfile( profile *models.Profile ) error {
+	return udb.conn.Table("profile_repositories").Delete(profile).Error
 }
 
-func (r *ProfileRepository) DeleteProfile( profile *models.Profile ) error {
-	for i, prof := range r.Profiles {
-		if prof.Id == profile.Id {
-			r.Profiles = append(r.Profiles[:i], r.Profiles[i + 1:]...)
-			return nil
-		}
-	}
-	return ProfileNotFound{}
+func (udb *ProfileRepository) GetProfile( login *string ) ( *models.Profile, error ) {
+	profile := new(models.Profile)
+	err := udb.conn.Table("profile_repositories").Where("login = ?", login).First(profile).Error
+
+	return profile, err
 }
 
-func (r *ProfileRepository) GetProfile( login *string ) ( *models.Profile, error ) {
-	for _, prof := range r.Profiles {
-		if prof.Login == *login {
-			return &prof, nil
-		}
+func (udb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *models.Profile) error {
+	prof := new(models.Profile)
+	err := udb.conn.Table("profile_repositories").Where("id = ?", profile.Id).First(prof).Error
+	if err != nil {
+		return err
+	}
+	if profileNew.Login != "" {
+		prof.Login = profileNew.Login
+	}
+	if profileNew.Email != "" {
+		prof.Email= profileNew.Email
+	}
+	if profileNew.Password != "" {
+		prof.Password = profileNew.Password
 	}
 
-	return nil, ProfileNotFound{}
+	if profileNew.Avatar != "" {
+		prof.Avatar = profileNew.Avatar
+	}
+
+	if profileNew.Name != "" {
+		prof.Name = profileNew.Name
+	}
+
+	if profileNew.Surname != "" {
+		prof.Surname = profileNew.Surname
+	}
+	return udb.conn.Table("profile_repositories").Save(prof).Error
+
 }
 
-func (r *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *models.Profile) error {
-	if _, err := r.GetProfile(&profile.Login); err != nil {
-		return ProfileNotFound{}
-	}
+func (udb *ProfileRepository) GetProfileWithCookie(cookie *http.Cookie) ( *models.Profile, error ) {
+	profile := new(models.Profile)
+	err := udb.conn.Table("profile_repositories").Where("Cookie = ?", cookie).First(profile).Error
 
-	for i, prof := range r.Profiles {
-		if prof.Id == profile.Id {
-			if profileNew.Login != "" {
-				r.Profiles[i].Login = profileNew.Login
-			}
-			if profileNew.Email != "" {
-				r.Profiles[i].Email = profileNew.Email
-			}
-			if profileNew.Password != "" {
-				r.Profiles[i].Password = profileNew.Password
-			}
-
-			if profileNew.Avatar != "" {
-				r.Profiles[i].Avatar = profileNew.Avatar
-			}
-
-			if profileNew.Name != "" {
-				r.Profiles[i].Name = profileNew.Name
-			}
-
-			if profileNew.Surname != "" {
-				r.Profiles[i].Surname = profileNew.Surname
-			}
-			return nil
-		}
-	}
-
-
-	return nil
+	return profile, err
 }
 
-func (r *ProfileRepository) GetProfileWithCookie(cookie *http.Cookie) ( *models.Profile, error ) {
-	for _, prof := range r.Profiles {
-		if prof.Cookie.Value == cookie.Value {
-			return &prof, nil
-
-		}
+func (udb *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie *http.Cookie) error {
+	prof := new(models.Profile)
+	err := udb.conn.Table("profile_repositories").Where("Id = ?", profile.Id).First(prof).Error
+	if err != nil {
+		return err
 	}
+	prof.Cookie = *cookie
 
-	return nil, ProfileNotFound{}
-}
-
-func (r *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie *http.Cookie) error {
-	for i, prof := range r.Profiles {
-		if prof.Id == profile.Id {
-			r.Profiles[i].Cookie = * cookie
-			return nil
-		}
-	}
-	return ProfileNotFound{}
+	return udb.conn.Table("profile_repositories").Save(prof).Error
 }
