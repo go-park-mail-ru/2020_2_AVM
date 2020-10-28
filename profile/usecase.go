@@ -2,7 +2,6 @@ package profile
 
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
-	"net/http"
 )
 
 type ProfileUsecase interface {
@@ -11,6 +10,6 @@ type ProfileUsecase interface {
 	GetProfile( login *string ) ( *models.Profile, error )
 	UpdateProfile( profile *models.Profile, profileNew *models.Profile) error
 	ProfileAvatarUpdate ( profile *models.Profile, avatarPath *string) error
-	SetCookieToProfile (profile *models.Profile, cookie *http.Cookie) error
-	GetProfileWithCookie(cookie *http.Cookie) ( *models.Profile, error )
+	SetCookieToProfile (profile *models.Profile, cookie *string) error
+	GetProfileWithCookie(cookie *string) ( *models.Profile, error )
 }

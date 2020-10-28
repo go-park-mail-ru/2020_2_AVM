@@ -3,7 +3,6 @@ package usecase
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"github.com/go-park-mail-ru/2020_2_AVM/profile"
-	"net/http"
 )
 
 type ProfileUseCase struct {
@@ -32,7 +31,7 @@ func (h *ProfileUseCase) GetProfile( login *string )( *models.Profile, error ) {
 	return h.DBConn.GetProfile(login)
 }
 
-func (h *ProfileUseCase) GetProfileWithCookie(cookie *http.Cookie)( *models.Profile, error){
+func (h *ProfileUseCase) GetProfileWithCookie(cookie *string)( *models.Profile, error){
 	return h.DBConn.GetProfileWithCookie(cookie)
 }
 
@@ -46,6 +45,6 @@ func (h *ProfileUseCase) ProfileAvatarUpdate ( profile *models.Profile, avatarPa
 	return h.DBConn.UpdateProfile(profile, prof)
 }
 
-func (h *ProfileUseCase) SetCookieToProfile (profile *models.Profile, cookie *http.Cookie) error {
+func (h *ProfileUseCase) SetCookieToProfile (profile *models.Profile, cookie *string) error {
 	return h.DBConn.SetCookieToProfile(profile, cookie)
 }

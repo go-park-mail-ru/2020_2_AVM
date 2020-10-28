@@ -3,14 +3,17 @@ package repository
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"gorm.io/gorm"
-	"net/http"
+	"sync"
 )
 
 type ProfileRepository struct {
 	conn   *gorm.DB
+	mute *sync.RWMutex
 }
-func NewProfileDatabase(db *gorm.DB) *ProfileRepository {
-	return &ProfileRepository{conn: db}
+
+func NewProfileRepository(db *gorm.DB, mt *sync.RWMutex) *ProfileRepository {
+	return &ProfileRepository{conn: db,
+								mute: mt}
 }
 
 type ProfileNotFound struct{}
@@ -24,7 +27,6 @@ type UnuniqueProfileData struct{}
 func (t UnuniqueProfileData) Error() string {
 	return "Profile already exists!"
 }
-
 
 func (udb *ProfileRepository) CreateProfile(profile *models.Profile) (err error) {
 	return udb.conn.Table("profile_repositories").Create(profile).Error
@@ -55,7 +57,6 @@ func (udb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew
 	if profileNew.Password != "" {
 		prof.Password = profileNew.Password
 	}
-
 	if profileNew.Avatar != "" {
 		prof.Avatar = profileNew.Avatar
 	}
@@ -71,14 +72,14 @@ func (udb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew
 
 }
 
-func (udb *ProfileRepository) GetProfileWithCookie(cookie *http.Cookie) ( *models.Profile, error ) {
+func (udb *ProfileRepository) GetProfileWithCookie(cookie *string) ( *models.Profile, error ) {
 	profile := new(models.Profile)
 	err := udb.conn.Table("profile_repositories").Where("Cookie = ?", cookie).First(profile).Error
 
 	return profile, err
 }
 
-func (udb *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie *http.Cookie) error {
+func (udb *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie *string) error {
 	prof := new(models.Profile)
 	err := udb.conn.Table("profile_repositories").Where("Id = ?", profile.Id).First(prof).Error
 	if err != nil {

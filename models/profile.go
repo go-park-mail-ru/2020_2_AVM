@@ -1,7 +1,5 @@
 package models
 
-import "net/http"
-
 type (
 	Profile struct {
 		Id uint64 `json:"id"`
@@ -11,6 +9,6 @@ type (
 		Surname string `json:"surname"`
 		Password string `json:"password"`
 		Avatar   string `json:"avatar"`
-		Cookie http.Cookie `json:"-"`
+		Cookie string `json:"-"`
 	}
 )

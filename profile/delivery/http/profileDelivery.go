@@ -61,7 +61,8 @@ func (h *ProfileHandler) Signin(c echo.Context) (err error) {
 			HttpOnly: true,
 		}
 		c.SetCookie(&cookie)
-		h.useCase.SetCookieToProfile(baseProfile, &cookie)
+		cookie_string := cookie.Value
+		h.useCase.SetCookieToProfile(baseProfile, &cookie_string)
 	} else {
 		return c.JSON(http.StatusBadRequest, "Wrong password")
 	}
@@ -74,13 +75,14 @@ func (h *ProfileHandler) Logout(c echo.Context) (err error) {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	prof, err := h.useCase.GetProfileWithCookie(cookie)
+	cookie_string := cookie.Value
+	prof, err := h.useCase.GetProfileWithCookie(&cookie_string)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	cookie.Expires = time.Now().AddDate(0, 0, -1)
-	emptyCookie := new(http.Cookie)
-	h.useCase.SetCookieToProfile(prof, emptyCookie)
+	cookie_empty := ""
+	h.useCase.SetCookieToProfile(prof, &cookie_empty)
 	c.SetCookie(cookie)
 
 	return c.JSON(http.StatusOK, "okk")
@@ -92,7 +94,8 @@ func (h *ProfileHandler) Profile(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, "bad")
 	}
 
-	answer, err := h.useCase.GetProfileWithCookie(cookie)
+	cookie_string := cookie.Value
+	answer, err := h.useCase.GetProfileWithCookie(&cookie_string)
 	if err != nil{
 		return c.JSON(http.StatusBadRequest, err)
 	}
@@ -106,7 +109,8 @@ func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 	if err == http.ErrNoCookie {
 		return c.JSON(http.StatusBadRequest, "bad")
 	}
-	profile, err := h.useCase.GetProfileWithCookie(cookie)
+	cookie_string := cookie.Value
+	profile, err := h.useCase.GetProfileWithCookie(&cookie_string)
 	if err != nil{
 		return c.JSON(http.StatusBadRequest, err)
 	}
@@ -129,7 +133,8 @@ func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 	if err == http.ErrNoCookie {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-	prof, err :=  h.useCase.GetProfileWithCookie(cookie)
+	cookie_string := cookie.Value
+	prof, err :=  h.useCase.GetProfileWithCookie(&cookie_string)
 	if err != nil{
 		return c.JSON(http.StatusBadRequest, err)
 	}
