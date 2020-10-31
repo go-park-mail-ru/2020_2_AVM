@@ -28,23 +28,49 @@ func (t UnuniqueProfileData) Error() string {
 	return "Profile already exists!"
 }
 
-func (udb *ProfileRepository) CreateProfile(profile *models.Profile) (err error) {
-	return udb.conn.Table("profile_repositories").Create(profile).Error
+func (udb *ProfileRepository) CreateProfile(profile *models.Profile) error {
+	var err error
+	udb.mute.Lock()
+	{
+		err = udb.conn.Table("user_profile").Create(profile).Error
+	}
+	udb.mute.Unlock()
+
+	return err
 }
 func (udb *ProfileRepository) DeleteProfile( profile *models.Profile ) error {
-	return udb.conn.Table("profile_repositories").Delete(profile).Error
+	var err error
+	udb.mute.Lock()
+	{
+		err =  udb.conn.Table("user_profile").Delete(profile).Error
+	}
+	udb.mute.Unlock()
+
+	return err
 }
 
 func (udb *ProfileRepository) GetProfile( login *string ) ( *models.Profile, error ) {
 	profile := new(models.Profile)
-	err := udb.conn.Table("profile_repositories").Where("login = ?", login).First(profile).Error
+
+	var err error
+	udb.mute.RLock()
+	{
+		err = udb.conn.Table("user_profile").Where("login = ?", login).First(profile).Error
+	}
+	udb.mute.RUnlock()
 
 	return profile, err
 }
 
 func (udb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *models.Profile) error {
 	prof := new(models.Profile)
-	err := udb.conn.Table("profile_repositories").Where("id = ?", profile.Id).First(prof).Error
+	var err error
+	udb.mute.RLock()
+	{
+		err = udb.conn.Table("user_profile").Where("id = ?", profile.Id).First(prof).Error
+	}
+	udb.mute.RUnlock()
+
 	if err != nil {
 		return err
 	}
@@ -68,24 +94,51 @@ func (udb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew
 	if profileNew.Surname != "" {
 		prof.Surname = profileNew.Surname
 	}
-	return udb.conn.Table("profile_repositories").Save(prof).Error
+
+	udb.mute.Lock()
+	{
+		err = udb.conn.Table("user_profile").Save(prof).Error
+	}
+	udb.mute.Unlock()
+
+	return err
+
 
 }
 
 func (udb *ProfileRepository) GetProfileWithCookie(cookie *string) ( *models.Profile, error ) {
 	profile := new(models.Profile)
-	err := udb.conn.Table("profile_repositories").Where("Cookie = ?", cookie).First(profile).Error
+
+	var err error
+	udb.mute.RLock()
+	{
+		err = udb.conn.Table("user_profile").Where("Cookie = ?", cookie).First(profile).Error
+	}
+	udb.mute.RUnlock()
 
 	return profile, err
 }
 
 func (udb *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie *string) error {
 	prof := new(models.Profile)
-	err := udb.conn.Table("profile_repositories").Where("Id = ?", profile.Id).First(prof).Error
+	var err error
+	udb.mute.RLock()
+	{
+		err = udb.conn.Table("user_profile").Where("Id = ?", profile.Id).First(prof).Error
+	}
+	udb.mute.RUnlock()
+
 	if err != nil {
 		return err
 	}
 	prof.Cookie = *cookie
 
-	return udb.conn.Table("profile_repositories").Save(prof).Error
+	udb.mute.Lock()
+	{
+		err = udb.conn.Table("user_profile").Save(prof).Error
+	}
+	udb.mute.Unlock()
+
+	return err
+
 }

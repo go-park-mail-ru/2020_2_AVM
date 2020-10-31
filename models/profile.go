@@ -2,7 +2,7 @@ package models
 
 type (
 	Profile struct {
-		Id uint64 `json:"id"`
+		Id uint64 `json:"id" sql:"AUTO_INCREMENT" gorm:"primary_key"`
 		Login string `json:"login"`
 		Email string `json:"email"`
 		Name string `json:"name"`

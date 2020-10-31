@@ -36,7 +36,7 @@ func configureAPI() *ServerStruct{
 	}
 	db.AutoMigrate(&profileRepository.ProfileRepository{})
 
-	db.Migrator().CreateTable(&model.Profile{Id:0, Login:"", Email:"", Name:"", Surname:"", Password:"", Avatar:"", Cookie:""})
+	db.Migrator().CreateTable(&model.Profile{})
 
 	artRepository := articleRepository.NewAricleRepository()
 	profRepository := profileRepository.NewProfileRepository(db, &mutex)
