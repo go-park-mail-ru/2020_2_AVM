@@ -9,5 +9,10 @@ type ArticleRepository interface {
 	DeleteArticle( article *models.Article ) error
 	GetArticlesByName( title *string ) ( []*models.Article, error )
 	GetArticlesByAuthorId( authorId uint64 ) ( []*models.Article, error )
+	GetArticlesByCategory( category *string ) ( []*models.Article, error )
+	GetAllCategories() ( []*models.Category, error )
+	CreateCategory( category models.Category ) error
+	GetArticlesByTag( tag *string ) ( []*models.Article, error )
+	CreateTag( tag models.Tag ) error
 }
 

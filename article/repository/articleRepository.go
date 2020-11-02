@@ -1,29 +1,21 @@
 package repository
 
 import (
+	"database/sql"
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
-
+	"gorm.io/gorm"
+	"sync"
 )
 
 type ArticleRepository struct {
-	Atricles []models.Article
-	articleId int
-}
-func NewAricleRepository() *ArticleRepository {
-	return &ArticleRepository{
-		Atricles: []models.Article{},
-		articleId: 0,
-	}
-}
-func (r *ArticleRepository) GetNewArcticleId() (int) {
-	r.articleId += 1
-	return r.articleId
+	conn   *gorm.DB
+	mute *sync.RWMutex
 }
 
-func NewHandler() (*ArticleRepository) {
-	return &ArticleRepository{nil, 0}
+func NewAricleRepository(db *gorm.DB, mt *sync.RWMutex) *ArticleRepository {
+	return &ArticleRepository{conn: db,
+		mute: mt}
 }
-
 
 type ArcticleNotFound struct{}
 
@@ -36,60 +28,151 @@ func (t UnuniqueArticle) Error() string {
 	return "Ununique Article Data!"
 }
 
+type CategoryNotFound struct{}
 
-
-func (r *ArticleRepository) CreateArticle( article *models.Article ) error {
-	for _, art := range r.Atricles {
-		if art.AuthorID == article.AuthorID && art.Title == article.Title {
-			return UnuniqueArticle{}
-		}
-	}
-	article.Id = uint64(r.GetNewArcticleId())
-	r.Atricles = append(r.Atricles, *article)
-
-	return nil
-}
-func (r *ArticleRepository) DeleteArticle( article *models.Article ) error {
-	for i, art := range r.Atricles {
-		if art.Id == article.Id {
-			r.Atricles = append(r.Atricles[:i], r.Atricles[i + 1:]...)
-			return nil
-		}
-	}
-
-	return ArcticleNotFound{}
+func (t CategoryNotFound) Error() string {
+	return "Category not found!"
 }
 
-func (r *ArticleRepository) GetArticlesByName( title *string ) ( []*models.Article, error ) {
-	var result = make([]*models.Article, 0)
-
-	for _, art := range r.Atricles {
-		if art.Title == *title {
-			result = append(result, &art)
-		}
+func (adb *ArticleRepository) CreateArticle( article *models.Article ) error {
+	var err error
+	adb.mute.Lock()
+	{
+		err = adb.conn.Table("article").Create(article).Error
 	}
-	if len(result) == 0 {
-		return nil, ArcticleNotFound{}
-	}
+	adb.mute.Unlock()
 
-	return result, nil
+	return err
+}
+func (adb *ArticleRepository) DeleteArticle( article *models.Article ) error {
+	var err error
+	adb.mute.Lock()
+	{
+		err = adb.conn.Table("article").Create(article).Error
+	}
+	adb.mute.Unlock()
+
+	return err
 }
 
-func (r *ArticleRepository) GetArticlesByAuthorId( authorId uint64 ) ( []*models.Article, error ) {
-	var result = make([]*models.Article, 0)
+func (adb *ArticleRepository) GetArticlesByName( title *string ) ( []*models.Article, error ) {
+	var result []*models.Article
 
-	for _, art := range r.Atricles {
-		if art.AuthorID == authorId {
-			buff := art
-			result = append(result, &buff)
-		}
-	}
-	if len(result) == 0 {
-		return nil, ArcticleNotFound{}
-	}
+	var err error
+	//var rows *sql.Rows
+	adb.mute.RLock()
+	{
+		err =  adb.conn.Table("article").Where("title = ?", title).Create(result).Error
+	/*	rows, err = adb.conn.Table("article").Where("title = ?", title).Rows()
+		defer rows.Close()
 
-	return result, nil
+		for rows.Next() {
+			article := new(models.Article)
+			adb.conn.ScanRows(rows, article)
+			result = append(result, article)
+		}*/
+	}
+	adb.mute.RUnlock()
+
+	return result, err
 }
 
+func (adb *ArticleRepository) GetArticlesByAuthorId( authorId uint64 ) ( []*models.Article, error ) {
+	var result []*models.Article
 
+	var err error
+	//var rows *sql.Rows
+	adb.mute.RLock()
+	{
+		err =  adb.conn.Table("article").Where("authorid = ?", authorId).Create(result).Error
+		/*	rows, err = adb.conn.Table("article").Where("authorid = ?", authorId).Rows()
+			defer rows.Close()
+
+			for rows.Next() {
+				article := new(models.Article)
+				adb.conn.ScanRows(rows, article)
+				result = append(result, article)
+			}*/
+	}
+	adb.mute.RUnlock()
+
+	return result, err
+}
+
+func (adb *ArticleRepository) GetArticlesByCategory( category *string ) ( []*models.Article, error ) {
+	var result []*models.Article
+	//var rows *sql.Rows
+	var err error
+	adb.mute.RLock()
+	{
+		var ctgr = new(models.Category)
+		err = adb.conn.Table("category").Where("title = ?", category).First(ctgr).Error
+		if err == nil {
+			err = adb.conn.Table("article").Where("categoryid = ?", ctgr.Id).Create(result).Error
+			/*	rows, err = adb.conn.Table("article").Where("authorid = ?", authorId).Rows()
+				defer rows.Close()
+
+				for rows.Next() {
+					article := new(models.Article)
+					adb.conn.ScanRows(rows, article)
+					result = append(result, article)
+				}*/
+		}
+	}
+	adb.mute.RUnlock()
+
+	return result, err
+}
+
+func (adb *ArticleRepository) GetAllCategories() ( []*models.Category, error ) {
+
+}
+
+func (adb *ArticleRepository) CreateCategory( category models.Category ) error {
+	var err error
+	adb.mute.Lock()
+	{
+		err = adb.conn.Table("category").Create(category).Error
+	}
+	adb.mute.Unlock()
+
+	return err
+}
+
+func (adb *ArticleRepository) GetArticlesByTag( tag *string ) ( []*models.Article, error ) {
+	var result []*models.Article
+	//var rows *sql.Rows
+	var err error
+	adb.mute.RLock()
+	{
+		var tg = new(models.Tag)
+		err = adb.conn.Table("tag").Where("title = ?", tag).First(tg).Error
+		if err == nil {
+			err = adb.conn.Table("tag").Where("categoryid = ?", tg.Id).Create(result).Error
+			/*	rows, err = adb.conn.Table("article").Where("authorid = ?", authorId).Rows()
+				defer rows.Close()
+
+				for rows.Next() {
+					article := new(models.Article)
+					adb.conn.ScanRows(rows, article)
+					result = append(result, article)
+				}*/
+		}
+	}
+	adb.mute.RUnlock()
+
+	return result, err
+
+}
+
+func (adb *ArticleRepository) CreateTag( tag models.Tag ) error {
+	var err error
+	adb.mute.Lock()
+	{
+		err = adb.conn.Table("tag").Create(tag).Error
+	}
+	adb.mute.Unlock()
+
+	return err
+}
 

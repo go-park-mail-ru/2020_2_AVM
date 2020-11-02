@@ -29,4 +29,12 @@ func (h *ArticleUseCase) GetArticlesByAuthorId( authorId uint64 ) ( []*models.Ar
 	return h.DBConnArt.GetArticlesByAuthorId(authorId)
 }
 
+func (h *ArticleUseCase) GetArticlesByCategory( category *string ) ( []*models.Article, error ) {
+	return h.DBConnArt.GetArticlesByCategory(category)
+}
+
+func (h *ArticleUseCase) GetArticlesByTag( tag *string ) ( []*models.Article, error ) {
+	return h.DBConnArt.GetArticlesByTag(tag)
+}
+
 

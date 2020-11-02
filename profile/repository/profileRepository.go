@@ -28,48 +28,48 @@ func (t UnuniqueProfileData) Error() string {
 	return "Profile already exists!"
 }
 
-func (udb *ProfileRepository) CreateProfile(profile *models.Profile) error {
+func (pdb *ProfileRepository) CreateProfile(profile *models.Profile) error {
 	var err error
-	udb.mute.Lock()
+	pdb.mute.Lock()
 	{
-		err = udb.conn.Table("user_profile").Create(profile).Error
+		err = pdb.conn.Table("profile").Create(profile).Error
 	}
-	udb.mute.Unlock()
+	pdb.mute.Unlock()
 
 	return err
 }
-func (udb *ProfileRepository) DeleteProfile( profile *models.Profile ) error {
+func (pdb *ProfileRepository) DeleteProfile( profile *models.Profile ) error {
 	var err error
-	udb.mute.Lock()
+	pdb.mute.Lock()
 	{
-		err =  udb.conn.Table("user_profile").Delete(profile).Error
+		err =  pdb.conn.Table("profile").Delete(profile).Error
 	}
-	udb.mute.Unlock()
+	pdb.mute.Unlock()
 
 	return err
 }
 
-func (udb *ProfileRepository) GetProfile( login *string ) ( *models.Profile, error ) {
+func (pdb *ProfileRepository) GetProfile( login *string ) ( *models.Profile, error ) {
 	profile := new(models.Profile)
 
 	var err error
-	udb.mute.RLock()
+	pdb.mute.RLock()
 	{
-		err = udb.conn.Table("user_profile").Where("login = ?", login).First(profile).Error
+		err = pdb.conn.Table("profile").Where("login = ?", login).First(profile).Error
 	}
-	udb.mute.RUnlock()
+	pdb.mute.RUnlock()
 
 	return profile, err
 }
 
-func (udb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *models.Profile) error {
+func (pdb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *models.Profile) error {
 	prof := new(models.Profile)
 	var err error
-	udb.mute.RLock()
+	pdb.mute.RLock()
 	{
-		err = udb.conn.Table("user_profile").Where("id = ?", profile.Id).First(prof).Error
+		err = pdb.conn.Table("profile").Where("id = ?", profile.Id).First(prof).Error
 	}
-	udb.mute.RUnlock()
+	pdb.mute.RUnlock()
 
 	if err != nil {
 		return err
@@ -95,50 +95,54 @@ func (udb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew
 		prof.Surname = profileNew.Surname
 	}
 
-	udb.mute.Lock()
+	pdb.mute.Lock()
 	{
-		err = udb.conn.Table("user_profile").Save(prof).Error
+		err = pdb.conn.Table("profile").Save(prof).Error
 	}
-	udb.mute.Unlock()
+	pdb.mute.Unlock()
 
 	return err
 
 
 }
 
-func (udb *ProfileRepository) GetProfileWithCookie(cookie *string) ( *models.Profile, error ) {
+func (pdb *ProfileRepository) GetProfileWithCookie(cookie *string) ( *models.Profile, error ) {
 	profile := new(models.Profile)
 
 	var err error
-	udb.mute.RLock()
+	pdb.mute.RLock()
 	{
-		err = udb.conn.Table("user_profile").Where("Cookie = ?", cookie).First(profile).Error
+		err = pdb.conn.Table("profile").Where("Cookie = ?", cookie).First(profile).Error
 	}
-	udb.mute.RUnlock()
+	pdb.mute.RUnlock()
 
 	return profile, err
 }
 
-func (udb *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie *string) error {
+func (pdb *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie *string) error {
 	prof := new(models.Profile)
 	var err error
-	udb.mute.RLock()
+	pdb.mute.RLock()
 	{
-		err = udb.conn.Table("user_profile").Where("Id = ?", profile.Id).First(prof).Error
+		err = pdb.conn.Table("profile").Where("Id = ?", profile.Id).First(prof).Error
 	}
-	udb.mute.RUnlock()
+	pdb.mute.RUnlock()
 
 	if err != nil {
 		return err
 	}
 	prof.Cookie = *cookie
 
-	udb.mute.Lock()
+	pdb.mute.Lock()
 	{
-		err = udb.conn.Table("user_profile").Save(prof).Error
+		err = pdb.conn.Table("profile").Save(prof).Error
 	}
-	udb.mute.Unlock()
+	pdb.mute.Unlock()
 
 	return err
+
+}
+
+func (pdb *ProfileRepository) SubscribeToCategory(profile *models.Profile, category *models.Category) error {
 
 }

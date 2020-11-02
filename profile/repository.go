@@ -11,4 +11,5 @@ type ProfileRepository interface {
 	UpdateProfile( profile *models.Profile, profileNew *models.Profile ) error
 	SetCookieToProfile (profile *models.Profile, cookie *string) error
 	GetProfileWithCookie(cookie *string) ( *models.Profile, error )
+	SubscribeToCategory(profile *models.Profile, category *models.Category) error
 }
