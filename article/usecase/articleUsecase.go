@@ -45,14 +45,14 @@ func (h *ArticleUseCase) GetArticlesByTag( tag *string ) ( []*models.Article, er
 }
 func (h *ArticleUseCase) GetArticlesByTags( tag models.Tags ) ( []*models.Article, error ) {
 	var result []*models.Article
-	for tag := range tag.Values {
-		buff, err :=  h.DBConnArt.GetArticlesByTag(tag.TagTitle)
+	for _, tag := range tag.TagsValues {
+		buff, err :=  h.DBConnArt.GetArticlesByTag(&tag.TagTitle)
 		if err != nil {
 			return nil, err
 		}
 		result = append(result, buff...)
 	}
-	return h.DBConnArt.GetArticlesByTag(tag)
+	return result, nil
 }
 
 func (h *ArticleUseCase) GetArticlesBySubscribe( profile *models.Profile ) ( []*models.Article, error ) {

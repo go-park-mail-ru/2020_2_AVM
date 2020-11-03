@@ -38,7 +38,7 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	}
 	categoryName := c.QueryParam("category_name")
 
-	if categoryID, err := h.useCaseProf.GetCategoryID(&categoryName); err !=nil {
+	if categoryID, err := h.useCaseArt.GetCategoryID(&categoryName); err !=nil {
 		return c.JSON(http.StatusBadRequest, err)
 	} else {
 		art.CategoryID = categoryID
@@ -78,7 +78,7 @@ func (h *ArticleHandler) SubscribedArticles(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	result, err := h.useCaseProf.GetArticlesBySubscribe(profile)
+	result, err := h.useCaseArt.GetArticlesBySubscribe(profile)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}

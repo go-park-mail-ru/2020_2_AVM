@@ -145,7 +145,7 @@ func (h *ProfileHandler) SubscribeProfileToCategory(c echo.Context) (err error) 
 	if err = c.Bind(category); err != nil {
 		return
 	}
-	category.Id, err = h.useCaseArt.GetCategoryID(&category.Title)
+	category.Id, err = h.useCaseArt.GetCategoryID(&category.CategoryTitle)
 
 	if err != nil{
 		return c.JSON(http.StatusBadRequest, err)
