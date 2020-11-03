@@ -12,4 +12,5 @@ type ProfileUsecase interface {
 	ProfileAvatarUpdate ( profile *models.Profile, avatarPath *string) error
 	SetCookieToProfile (profile *models.Profile, cookie *string) error
 	GetProfileWithCookie(cookie *string) ( *models.Profile, error )
+	SubscribeToCategory(profile *models.Profile, category *models.Category) error
 }

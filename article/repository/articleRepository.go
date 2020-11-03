@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"database/sql"
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"gorm.io/gorm"
 	"sync"
@@ -62,7 +61,7 @@ func (adb *ArticleRepository) GetArticlesByName( title *string ) ( []*models.Art
 	//var rows *sql.Rows
 	adb.mute.RLock()
 	{
-		err =  adb.conn.Table("article").Where("title = ?", title).Create(result).Error
+		err =  adb.conn.Table("article").Where("article_title = ?", title).Create(result).Error
 	/*	rows, err = adb.conn.Table("article").Where("title = ?", title).Rows()
 		defer rows.Close()
 
@@ -126,6 +125,7 @@ func (adb *ArticleRepository) GetArticlesByCategory( category *string ) ( []*mod
 
 func (adb *ArticleRepository) GetAllCategories() ( []*models.Category, error ) {
 
+	return  nil, nil
 }
 
 func (adb *ArticleRepository) CreateCategory( category models.Category ) error {
@@ -176,3 +176,42 @@ func (adb *ArticleRepository) CreateTag( tag models.Tag ) error {
 	return err
 }
 
+func (adb *ArticleRepository) GetCategoryID (title *string) (uint64, error) {
+	category := new(models.Category)
+
+	var err error
+	adb.mute.RLock()
+	{
+		err = adb.conn.Table("category").Where("category_title = ?", title).First(category).Error
+	}
+	adb.mute.RUnlock()
+
+	return category.Id, err
+}
+
+func (adb *ArticleRepository) GetTagID (title *string) (uint64, error) {
+	tag := new(models.Tag)
+
+	var err error
+	adb.mute.RLock()
+	{
+		err = adb.conn.Table("tag").Where("tag_title = ?", title).First(tag).Error
+	}
+	adb.mute.RUnlock()
+
+	return tag.Id, err
+}
+
+func (adb *ArticleRepository) GetSubscribedCategories(profile *models.Profile)  error {
+	tags = new(models.Tags)
+
+	var err error
+	adb.mute.Lock()
+	{
+		err = adb.conn.Table("category_follow").Where("profileid = ?", title).First(category).Error
+		//нужно получить массив категорий
+	}
+	adb.mute.Unlock()
+
+	return err
+}

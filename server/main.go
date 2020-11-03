@@ -46,7 +46,7 @@ func configureAPI() *ServerStruct{
 	profUseCase := profileUseCase.NewProfileUseCase(profRepository)
 
 	artHandler := articleDelivery.NewAricleHandler(artUseCase, profUseCase)
-	profHandler := profileDelivery.NewProfileHandler(profUseCase)
+	profHandler := profileDelivery.NewProfileHandler(artUseCase, profUseCase)
 
 	return &ServerStruct{
 		ArticleHandler: artHandler,

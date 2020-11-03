@@ -144,5 +144,16 @@ func (pdb *ProfileRepository) SetCookieToProfile (profile *models.Profile, cooki
 }
 
 func (pdb *ProfileRepository) SubscribeToCategory(profile *models.Profile, category *models.Category) error {
+	sub := new(models.CategoryFollow)
+	sub.CategoryID = category.Id
+	sub.ProfileID = profile.Id
 
+	var err error
+	pdb.mute.Lock()
+	{
+		err = pdb.conn.Table("category_follow").Create(sub).Error
+	}
+	pdb.mute.Unlock()
+
+	return err
 }

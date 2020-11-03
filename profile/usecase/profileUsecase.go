@@ -48,3 +48,7 @@ func (h *ProfileUseCase) ProfileAvatarUpdate ( profile *models.Profile, avatarPa
 func (h *ProfileUseCase) SetCookieToProfile (profile *models.Profile, cookie *string) error {
 	return h.DBConn.SetCookieToProfile(profile, cookie)
 }
+
+func (h *ProfileUseCase) SubscribeToCategory(profile *models.Profile, category *models.Category) error {
+	return h.DBConn.SubscribeToCategory(profile, category)
+}
