@@ -48,8 +48,9 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	//Тэги
 	err = h.useCaseArt.CreateArticle(art)
+	h.useCaseArt.
+	//Тэги
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
@@ -85,7 +86,57 @@ func (h *ArticleHandler) SubscribedArticles(c echo.Context) (err error) {
 
 	return c.JSON(http.StatusOK, result)
 }
-func (h *ProfileHandler) ArticlesByTag(c echo.Context) (err error) {
+func (h *ArticleHandler) ArticlesByTag(c echo.Context) (err error) {
 
-	return c.JSON(http.StatusOK, result)
+	tag := new(models.Tag)
+
+	if err = c.Bind(tag); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	articles, err := h.useCaseArt.GetArticlesByTag(&tag.TagTitle)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	return c.JSON(http.StatusOK, articles)
+}
+
+func (h *ArticleHandler) ArticlesByCategory(c echo.Context) (err error) {
+
+	category := new(models.Category)
+	if err = c.Bind(category); err != nil{
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	articles, err := h.useCaseArt.GetArticlesByCategory(&category.CategoryTitle)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	return c.JSON(http.StatusOK, articles)
+}
+
+
+func (h *ArticleHandler) SubscribeToCategory(c echo.Context) (err error) {
+
+	cookie, err := c.Cookie("session_id")
+	if err == http.ErrNoCookie {
+		return c.JSON(http.StatusBadRequest, "bad")
+	}
+	cookie_string := cookie.Value
+	profile, err := h.useCaseProf.GetProfileWithCookie(&cookie_string)
+	if err != nil{
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	category := new(models.Category)
+
+	if err = c.Bind(category); err != nil || cookie == nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	category.Id, err = h.useCaseArt.GetCategoryID(&category.CategoryTitle)
+
+	if err != nil{
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	h.useCaseProf.SubscribeToCategory(profile, category)
+
+	return nil
 }

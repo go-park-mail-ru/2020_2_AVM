@@ -72,17 +72,21 @@ func main() {
 
 
 	// Routes
-	e.POST("/api/article", serverConfig.ArticleHandler.CreateArticle)
 
 	e.GET("/api/article/author/:author", serverConfig.ArticleHandler.ArticleByAuthor)
+	e.GET("/api/article/tag/", serverConfig.ArticleHandler.ArticlesByTag)
+	e.GET("/api/article/category/", serverConfig.ArticleHandler.ArticlesByCategory)
+	e.GET("/api/article/subscribe/", serverConfig.ArticleHandler.SubscribedArticles)
 	e.GET("/api/avatar", serverConfig.profileHandler.AvatarDefault)
 	e.GET("/api/avatar/title/:name", serverConfig.profileHandler.Avatar)
 	e.GET("/api/profile", serverConfig.profileHandler.Profile)
 	e.PUT("/api/setting/avatar", serverConfig.profileHandler.ProfileEditAvatar)
 	e.PUT("/api/setting", serverConfig.profileHandler.ProfileEdit)
+	e.POST("/api/article", serverConfig.ArticleHandler.CreateArticle)
 	e.POST("/api/signup", serverConfig.profileHandler.Signup)
 	e.POST("/api/signin", serverConfig.profileHandler.Signin)
 	e.POST("/api/logout", serverConfig.profileHandler.Logout)
+	e.POST("/api/subscribe", serverConfig.ArticleHandler.SubscribeToCategory)
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
 }
