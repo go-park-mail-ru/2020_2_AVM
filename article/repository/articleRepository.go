@@ -7,7 +7,7 @@ import (
 )
 
 type ArticleRepository struct {
-	conn   *gorm.DB
+	conn *gorm.DB
 	mute *sync.RWMutex
 }
 
@@ -21,6 +21,7 @@ type ArcticleNotFound struct{}
 func (t ArcticleNotFound) Error() string {
 	return "Articles not found!"
 }
+
 type UnuniqueArticle struct{}
 
 func (t UnuniqueArticle) Error() string {
@@ -33,57 +34,57 @@ func (t CategoryNotFound) Error() string {
 	return "Category not found!"
 }
 
-func (adb *ArticleRepository) CreateArticle( article *models.Article ) error {
+func (adb *ArticleRepository) CreateArticle(article *models.Article) error {
 	var err error
 	adb.mute.Lock()
 	{
-		err = adb.conn.Table("article").Create(article).Error
+		err = adb.conn.Table("articles").Create(article).Error
 	}
 	adb.mute.Unlock()
 
 	return err
 }
-func (adb *ArticleRepository) DeleteArticle( article *models.Article ) error {
+func (adb *ArticleRepository) DeleteArticle(article *models.Article) error {
 	var err error
 	adb.mute.Lock()
 	{
-		err = adb.conn.Table("article").Delete(article).Error
+		err = adb.conn.Table("articles").Delete(article).Error
 	}
 	adb.mute.Unlock()
 
 	return err
 }
 
-func (adb *ArticleRepository) GetArticlesByName( title *string ) ( []*models.Article, error ) {
+func (adb *ArticleRepository) GetArticlesByName(title *string) ([]*models.Article, error) {
 	var result []*models.Article
 
 	var err error
 	//var rows *sql.Rows
 	adb.mute.RLock()
 	{
-		err =  adb.conn.Table("article").Where("article_title = ?", title).Find(result).Error
-	/*	rows, err = adb.conn.Table("article").Where("title = ?", title).Rows()
-		defer rows.Close()
+		err = adb.conn.Table("articles").Where("article_title = ?", title).Find(result).Error
+		/*	rows, err = adb.conn.Table("article").Where("title = ?", title).Rows()
+			defer rows.Close()
 
-		for rows.Next() {
-			article := new(models.Article)
-			adb.conn.ScanRows(rows, article)
-			result = append(result, article)
-		}*/
+			for rows.Next() {
+				article := new(models.Article)
+				adb.conn.ScanRows(rows, article)
+				result = append(result, article)
+			}*/
 	}
 	adb.mute.RUnlock()
 
 	return result, err
 }
 
-func (adb *ArticleRepository) GetArticlesByAuthorId( authorId uint64 ) ( []*models.Article, error ) {
+func (adb *ArticleRepository) GetArticlesByAuthorId(authorId uint64) ([]*models.Article, error) {
 	var result []*models.Article
 
 	var err error
 	//var rows *sql.Rows
 	adb.mute.RLock()
 	{
-		err =  adb.conn.Table("article").Where("authorid = ?", authorId).Find(result).Error
+		err = adb.conn.Table("articles").Where("authorid = ?", authorId).Find(result).Error
 		/*	rows, err = adb.conn.Table("article").Where("authorid = ?", authorId).Rows()
 			defer rows.Close()
 
@@ -98,7 +99,7 @@ func (adb *ArticleRepository) GetArticlesByAuthorId( authorId uint64 ) ( []*mode
 	return result, err
 }
 
-func (adb *ArticleRepository) GetArticlesByCategory( category *string ) ( []*models.Article, error ) {
+func (adb *ArticleRepository) GetArticlesByCategory(category *string) ([]*models.Article, error) {
 	var result []*models.Article
 	//var rows *sql.Rows
 	var err error
@@ -107,7 +108,7 @@ func (adb *ArticleRepository) GetArticlesByCategory( category *string ) ( []*mod
 		var ctgr = new(models.Category)
 		err = adb.conn.Table("category").Where("title = ?", category).First(ctgr).Error
 		if err == nil {
-			err = adb.conn.Table("article").Where("categoryid = ?", ctgr.Id).Find(result).Error
+			err = adb.conn.Table("articles").Where("categoryid = ?", ctgr.Id).Find(result).Error
 			/*	rows, err = adb.conn.Table("article").Where("authorid = ?", authorId).Rows()
 				defer rows.Close()
 
@@ -123,12 +124,12 @@ func (adb *ArticleRepository) GetArticlesByCategory( category *string ) ( []*mod
 	return result, err
 }
 
-func (adb *ArticleRepository) GetAllCategories() ( []*models.Category, error ) {
+func (adb *ArticleRepository) GetAllCategories() ([]*models.Category, error) {
 
-	return  nil, nil
+	return nil, nil
 }
 
-func (adb *ArticleRepository) CreateCategory( category models.Category ) error {
+func (adb *ArticleRepository) CreateCategory(category models.Category) error {
 	var err error
 	adb.mute.Lock()
 	{
@@ -139,21 +140,21 @@ func (adb *ArticleRepository) CreateCategory( category models.Category ) error {
 	return err
 }
 
-func (adb *ArticleRepository) GetArticlesById( id uint64 ) ( *models.Article, error ) {
+func (adb *ArticleRepository) GetArticlesById(id uint64) (*models.Article, error) {
 	result := new(models.Article)
 
 	var err error
 
 	adb.mute.RLock()
 	{
-		err = adb.conn.Table("article").Where("id = ?", id).First(result).Error
+		err = adb.conn.Table("articles").Where("id = ?", id).First(result).Error
 	}
 	adb.mute.RUnlock()
 
 	return result, err
 }
 
-func (adb *ArticleRepository) GetArticlesByTag( tag *string ) ( []*models.Article, error ) {
+func (adb *ArticleRepository) GetArticlesByTag(tag *string) ([]*models.Article, error) {
 	var result []*models.Article
 	var tagArticles []*models.TagArticle
 	//var rows *sql.Rows
@@ -165,7 +166,7 @@ func (adb *ArticleRepository) GetArticlesByTag( tag *string ) ( []*models.Articl
 		if err == nil {
 			err = adb.conn.Table("tag_article").Where("tagid = ?", tg.Id).Find(tagArticles).Error
 			if err == nil {
-				for _, tagArt := range tagArticles{
+				for _, tagArt := range tagArticles {
 					article, err := adb.GetArticlesById(tagArt.ArticleID)
 					if err == nil {
 						result = append(result, article)
@@ -189,7 +190,7 @@ func (adb *ArticleRepository) GetArticlesByTag( tag *string ) ( []*models.Articl
 
 }
 
-func (adb *ArticleRepository) CreateTag( tag models.Tag ) error {
+func (adb *ArticleRepository) CreateTag(tag models.Tag) error {
 	var err error
 	adb.mute.Lock()
 	{
@@ -200,7 +201,7 @@ func (adb *ArticleRepository) CreateTag( tag models.Tag ) error {
 	return err
 }
 
-func (adb *ArticleRepository) GetCategoryID (title *string) (uint64, error) {
+func (adb *ArticleRepository) GetCategoryID(title *string) (uint64, error) {
 	category := new(models.Category)
 
 	var err error
@@ -213,7 +214,7 @@ func (adb *ArticleRepository) GetCategoryID (title *string) (uint64, error) {
 	return category.Id, err
 }
 
-func (adb *ArticleRepository) GetTagID (title *string) (uint64, error) {
+func (adb *ArticleRepository) GetTagID(title *string) (uint64, error) {
 	tag := new(models.Tag)
 
 	var err error
@@ -226,7 +227,7 @@ func (adb *ArticleRepository) GetTagID (title *string) (uint64, error) {
 	return tag.Id, err
 }
 
-func (adb *ArticleRepository) GetSubscribedCategories(profile *models.Profile)  error {
+func (adb *ArticleRepository) GetSubscribedCategories(profile *models.Profile) error {
 	tags := new(models.Tags)
 
 	var err error

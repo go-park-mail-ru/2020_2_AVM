@@ -1,17 +1,17 @@
 package main
 
 import (
-	model "github.com/go-park-mail-ru/2020_2_AVM/models"
 	articleDelivery "github.com/go-park-mail-ru/2020_2_AVM/article/delivery/http"
 	articleRepository "github.com/go-park-mail-ru/2020_2_AVM/article/repository"
 	articleUseCase "github.com/go-park-mail-ru/2020_2_AVM/article/usecase"
+	model "github.com/go-park-mail-ru/2020_2_AVM/models"
 	profileDelivery "github.com/go-park-mail-ru/2020_2_AVM/profile/delivery/http"
 	profileRepository "github.com/go-park-mail-ru/2020_2_AVM/profile/repository"
 	profileUseCase "github.com/go-park-mail-ru/2020_2_AVM/profile/usecase"
 	"sync"
 
-	"gorm.io/gorm"
 	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -19,16 +19,17 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
-type ServerStruct struct{
+type ServerStruct struct {
 	ArticleHandler *articleDelivery.ArticleHandler
 	profileHandler *profileDelivery.ProfileHandler
-	httpServer *http.Server
+	httpServer     *http.Server
 }
 
-func configureAPI() *ServerStruct{
+func configureAPI() *ServerStruct {
 	mutex := sync.RWMutex{}
 
 	dsn := "host=localhost user=avm_user password=qwerty123 dbname=avmvc port=5432 sslmode=disable"
+	//dsn := "host=localhost user=mark password=mark dbname=mark_avm_db port=5432 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -62,14 +63,12 @@ func main() {
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowCredentials: true,
-		AllowOrigins: []string{"http://localhost:1323", "http://localhost:3000", "http://95.163.250.127:8080"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, CSRFHeader},
+		AllowOrigins:     []string{"http://localhost:1323", "http://localhost:8080", "http://95.163.250.127:8080"},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, CSRFHeader},
 	}))
-
 
 	e.Logger.SetLevel(log.DEBUG)
 	e.Use(middleware.Logger())
-
 
 	// Routes
 

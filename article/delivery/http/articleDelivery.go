@@ -1,26 +1,25 @@
 package http
 
 import (
-	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"github.com/go-park-mail-ru/2020_2_AVM/article"
+	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"github.com/go-park-mail-ru/2020_2_AVM/profile"
-	"strconv"
 	"github.com/labstack/echo"
 	"net/http"
+	"strconv"
 )
 
 type ArticleHandler struct {
-	useCaseArt article.ArticleUsecase
+	useCaseArt  article.ArticleUsecase
 	useCaseProf profile.ProfileUsecase
 }
 
-func NewAricleHandler (uCA article.ArticleUsecase, uCP profile.ProfileUsecase) *ArticleHandler {
+func NewAricleHandler(uCA article.ArticleUsecase, uCP profile.ProfileUsecase) *ArticleHandler {
 	return &ArticleHandler{
-		useCaseArt: uCA,
+		useCaseArt:  uCA,
 		useCaseProf: uCP,
 	}
 }
-
 
 func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	art := new(models.Article)
@@ -31,14 +30,14 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	}
 
 	cookie_string := cookie.Value
-	if prof, err := h.useCaseProf.GetProfileWithCookie(&cookie_string); err !=nil {
+	if prof, err := h.useCaseProf.GetProfileWithCookie(&cookie_string); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	} else {
 		art.AuthorID = prof.Id
 	}
 	categoryName := c.QueryParam("category_name")
 
-	if categoryID, err := h.useCaseArt.GetCategoryID(&categoryName); err !=nil {
+	if categoryID, err := h.useCaseArt.GetCategoryID(&categoryName); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	} else {
 		art.CategoryID = categoryID
@@ -49,7 +48,7 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	}
 
 	err = h.useCaseArt.CreateArticle(art)
-	h.useCaseArt.
+	//h.useCaseArt.
 	//Тэги
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
@@ -75,7 +74,7 @@ func (h *ArticleHandler) SubscribedArticles(c echo.Context) (err error) {
 	}
 	cookie_string := cookie.Value
 	profile, err := h.useCaseProf.GetProfileWithCookie(&cookie_string)
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -103,7 +102,7 @@ func (h *ArticleHandler) ArticlesByTag(c echo.Context) (err error) {
 func (h *ArticleHandler) ArticlesByCategory(c echo.Context) (err error) {
 
 	category := new(models.Category)
-	if err = c.Bind(category); err != nil{
+	if err = c.Bind(category); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	articles, err := h.useCaseArt.GetArticlesByCategory(&category.CategoryTitle)
@@ -113,7 +112,6 @@ func (h *ArticleHandler) ArticlesByCategory(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, articles)
 }
 
-
 func (h *ArticleHandler) SubscribeToCategory(c echo.Context) (err error) {
 
 	cookie, err := c.Cookie("session_id")
@@ -122,7 +120,7 @@ func (h *ArticleHandler) SubscribeToCategory(c echo.Context) (err error) {
 	}
 	cookie_string := cookie.Value
 	profile, err := h.useCaseProf.GetProfileWithCookie(&cookie_string)
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -133,7 +131,7 @@ func (h *ArticleHandler) SubscribeToCategory(c echo.Context) (err error) {
 	}
 	category.Id, err = h.useCaseArt.GetCategoryID(&category.CategoryTitle)
 
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	h.useCaseProf.SubscribeToCategory(profile, category)

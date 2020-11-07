@@ -7,13 +7,13 @@ import (
 )
 
 type ProfileRepository struct {
-	conn   *gorm.DB
+	conn *gorm.DB
 	mute *sync.RWMutex
 }
 
 func NewProfileRepository(db *gorm.DB, mt *sync.RWMutex) *ProfileRepository {
 	return &ProfileRepository{conn: db,
-								mute: mt}
+		mute: mt}
 }
 
 type ProfileNotFound struct{}
@@ -32,42 +32,42 @@ func (pdb *ProfileRepository) CreateProfile(profile *models.Profile) error {
 	var err error
 	pdb.mute.Lock()
 	{
-		err = pdb.conn.Table("profile").Create(profile).Error
+		err = pdb.conn.Table("profiles").Create(profile).Error
 	}
 	pdb.mute.Unlock()
 
 	return err
 }
-func (pdb *ProfileRepository) DeleteProfile( profile *models.Profile ) error {
+func (pdb *ProfileRepository) DeleteProfile(profile *models.Profile) error {
 	var err error
 	pdb.mute.Lock()
 	{
-		err =  pdb.conn.Table("profile").Delete(profile).Error
+		err = pdb.conn.Table("profiles").Delete(profile).Error
 	}
 	pdb.mute.Unlock()
 
 	return err
 }
 
-func (pdb *ProfileRepository) GetProfile( login *string ) ( *models.Profile, error ) {
+func (pdb *ProfileRepository) GetProfile(login *string) (*models.Profile, error) {
 	profile := new(models.Profile)
 
 	var err error
 	pdb.mute.RLock()
 	{
-		err = pdb.conn.Table("profile").Where("login = ?", login).First(profile).Error
+		err = pdb.conn.Table("profiles").Where("login = ?", login).First(profile).Error
 	}
 	pdb.mute.RUnlock()
 
 	return profile, err
 }
 
-func (pdb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew *models.Profile) error {
+func (pdb *ProfileRepository) UpdateProfile(profile *models.Profile, profileNew *models.Profile) error {
 	prof := new(models.Profile)
 	var err error
 	pdb.mute.RLock()
 	{
-		err = pdb.conn.Table("profile").Where("id = ?", profile.Id).First(prof).Error
+		err = pdb.conn.Table("profiles").Where("id = ?", profile.Id).First(prof).Error
 	}
 	pdb.mute.RUnlock()
 
@@ -78,7 +78,7 @@ func (pdb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew
 		prof.Login = profileNew.Login
 	}
 	if profileNew.Email != "" {
-		prof.Email= profileNew.Email
+		prof.Email = profileNew.Email
 	}
 	if profileNew.Password != "" {
 		prof.Password = profileNew.Password
@@ -97,34 +97,33 @@ func (pdb *ProfileRepository) UpdateProfile( profile *models.Profile, profileNew
 
 	pdb.mute.Lock()
 	{
-		err = pdb.conn.Table("profile").Save(prof).Error
+		err = pdb.conn.Table("profiles").Save(prof).Error
 	}
 	pdb.mute.Unlock()
 
 	return err
 
-
 }
 
-func (pdb *ProfileRepository) GetProfileWithCookie(cookie *string) ( *models.Profile, error ) {
+func (pdb *ProfileRepository) GetProfileWithCookie(cookie *string) (*models.Profile, error) {
 	profile := new(models.Profile)
 
 	var err error
 	pdb.mute.RLock()
 	{
-		err = pdb.conn.Table("profile").Where("Cookie = ?", cookie).First(profile).Error
+		err = pdb.conn.Table("profiles").Where("Cookie = ?", cookie).First(profile).Error
 	}
 	pdb.mute.RUnlock()
 
 	return profile, err
 }
 
-func (pdb *ProfileRepository) SetCookieToProfile (profile *models.Profile, cookie *string) error {
+func (pdb *ProfileRepository) SetCookieToProfile(profile *models.Profile, cookie *string) error {
 	prof := new(models.Profile)
 	var err error
 	pdb.mute.RLock()
 	{
-		err = pdb.conn.Table("profile").Where("Id = ?", profile.Id).First(prof).Error
+		err = pdb.conn.Table("profiles").Where("Id = ?", profile.Id).First(prof).Error
 	}
 	pdb.mute.RUnlock()
 
@@ -135,7 +134,7 @@ func (pdb *ProfileRepository) SetCookieToProfile (profile *models.Profile, cooki
 
 	pdb.mute.Lock()
 	{
-		err = pdb.conn.Table("profile").Save(prof).Error
+		err = pdb.conn.Table("profiles").Save(prof).Error
 	}
 	pdb.mute.Unlock()
 
