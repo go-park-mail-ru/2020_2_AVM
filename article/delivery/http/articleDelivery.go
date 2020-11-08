@@ -35,19 +35,27 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 		art.AuthorID = prof.Id
 	}
 
-	categoryName := c.Param("author")
+	category := new(models.Category)
 
-	if categoryID, err := h.useCaseArt.GetCategoryID(&categoryName); err != nil {
+	if err = c.Bind(category); err != nil { //нужно забиндить имя
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	if categoryID, err := h.useCaseArt.GetCategoryID(&category.CategoryTitle); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	} else {
 		art.CategoryID = categoryID
 	}
-	tags := new(models.Tags)
+
+	err = h.useCaseArt.CreateArticle(art)
+	//нужно получить id статьи методом ниже, чтобы потом связывать его через Link
+	//GetArticleIdByNameAndAuthorId
+	//articleid = h.useCaseArt.GetArticleIdByNameAndAuthorId()
+	tags := new(models.Tags) // нужно получить массив тэгов и потом для каждого вызвать Link
 	if err = c.Bind(tags); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	err = h.useCaseArt.CreateArticle(art)
 	//h.useCaseArt.
 	//Тэги
 	if err != nil {

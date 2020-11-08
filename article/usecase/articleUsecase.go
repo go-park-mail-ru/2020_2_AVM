@@ -60,5 +60,13 @@ func (h *ArticleUseCase) GetArticlesBySubscribe( profile *models.Profile ) ( []*
 	return nil, nil
 }
 
+func (h *ArticleUseCase) GetArticleIdByNameAndAuthorId (title *string, authorid uint64) (uint64, error) {
+	return h.DBConnArt.GetArticleIdByNameAndAuthorId(title, authorid)
+}
+
+func (h *ArticleUseCase) LinkTagAndArticle(tagid uint64, articleid uint64) error {
+	return h.DBConnArt.LinkTagAndArticle(tagid, articleid)
+}
+
 
 

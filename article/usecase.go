@@ -12,5 +12,7 @@ type ArticleUsecase interface {
 	GetArticlesByCategory( category *string ) ( []*models.Article, error )
 	GetArticlesByTag( tag *string ) ( []*models.Article, error )
 	GetArticlesBySubscribe( profile *models.Profile ) ( []*models.Article, error )
+	GetArticleIdByNameAndAuthorId (title *string, authorid uint64) (uint64, error)
+	LinkTagAndArticle(tagid uint64, articleid uint64) error
 }
 

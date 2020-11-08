@@ -227,13 +227,41 @@ func (adb *ArticleRepository) GetTagID(title *string) (uint64, error) {
 	return tag.Id, err
 }
 
+func (adb *ArticleRepository) GetArticleIdByNameAndAuthorId (title *string, authorid uint64) (uint64, error) {
+	article := new(models.Article)
+
+	var err error
+	adb.mute.RLock()
+	{
+		err = adb.conn.Table("article").Where("article_title = ? AND authorid = ?", title, authorid).First(article).Error
+	}
+	adb.mute.RUnlock()
+
+	return article.Id, err
+}
+
 func (adb *ArticleRepository) GetSubscribedCategories(profile *models.Profile) error {
 	tags := new(models.Tags)
 
 	var err error
-	adb.mute.Lock()
+	adb.mute.RLock()
 	{
 		err = adb.conn.Table("category_follow").Where("profileid = ?", profile.Id).First(tags).Error
+		//нужно получить массив категорий
+	}
+	adb.mute.RUnlock()
+
+	return err
+}
+
+func (adb *ArticleRepository) LinkTagAndArticle(tagid uint64, articleid uint64) error {
+	tagarticle := new(models.TagArticle)
+	tagarticle.ArticleID = articleid
+	tagarticle.TagID = tagid
+	var err error
+	adb.mute.Lock()
+	{
+		err = adb.conn.Table("tag_article").Create(tagarticle).Error
 		//нужно получить массив категорий
 	}
 	adb.mute.Unlock()
