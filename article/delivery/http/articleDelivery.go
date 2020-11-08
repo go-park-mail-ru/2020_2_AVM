@@ -29,7 +29,8 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	cookie_string := cookie.Value
-	if prof, err := h.useCaseProf.GetProfileWithCookie(&cookie_string); err != nil {
+	prof, err := h.useCaseProf.GetProfileWithCookie(&cookie_string)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	} else {
 		art.AuthorID = prof.Id
@@ -48,16 +49,25 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	}
 
 	err = h.useCaseArt.CreateArticle(art)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
 	//нужно получить id статьи методом ниже, чтобы потом связывать его через Link
 	//GetArticleIdByNameAndAuthorId
-	//articleid = h.useCaseArt.GetArticleIdByNameAndAuthorId()
+	articleid, err := h.useCaseArt.GetArticleIdByNameAndAuthorId(&art.ArticleTitle, prof.Id)
+
 	tags := new(models.Tags) // нужно получить массив тэгов и потом для каждого вызвать Link
 	if err = c.Bind(tags); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
+	for _, tag := range tags.TagsValues {
+		tagid, err  := h.useCaseArt.GetTagID(&tag.TagTitle)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, err)
+		}
+		h.useCaseArt.LinkTagAndArticle(tagid, articleid)
+	}
 
-	//h.useCaseArt.
-	//Тэги
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}

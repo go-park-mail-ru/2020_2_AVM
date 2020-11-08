@@ -26,7 +26,21 @@ func (h *ArticleUseCase) GetCategoryID (title *string) (uint64, error){
 	return h.DBConnArt.GetCategoryID(title)
 }
 func (h *ArticleUseCase) GetTagID (title *string) (uint64, error){
-	return h.DBConnArt.GetTagID(title)
+	id, err := h.DBConnArt.GetTagID(title)
+	if err != nil {
+		newtag := new(models.Tag)
+		newtag.TagTitle = *title
+		err := h.DBConnArt.CreateTag(*newtag)
+		if err != nil {
+			return 9999, err
+		}
+		id, err = h.DBConnArt.GetTagID(title)
+		if err != nil {
+			return 9999, err
+		}
+	}
+	return id, err
+
 }
 
 func (h *ArticleUseCase) GetArticlesByName( title *string ) ( []*models.Article, error ) {
@@ -56,6 +70,9 @@ func (h *ArticleUseCase) GetArticlesByTags( tag models.Tags ) ( []*models.Articl
 }
 
 func (h *ArticleUseCase) GetArticlesBySubscribe( profile *models.Profile ) ( []*models.Article, error ) {
+	result = new([]*models.Article)
+
+	categories = h.DBConnArt.GetSubscribedCategories(profile)
 
 	return nil, nil
 }

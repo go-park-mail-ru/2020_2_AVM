@@ -19,5 +19,6 @@ type ArticleRepository interface {
 	GetArticleIdByNameAndAuthorId (title *string, authorid uint64) (uint64, error)
 	GetTagID (title *string) (uint64, error)
 	LinkTagAndArticle(tagid uint64, articleid uint64) error
+	GetSubscribedCategories(profile *models.Profile) ([]*models.Category, error)
 }
 
