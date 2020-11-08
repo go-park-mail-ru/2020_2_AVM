@@ -28,14 +28,14 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	if err = c.Bind(art); err != nil || cookie == nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
-
 	cookie_string := cookie.Value
 	if prof, err := h.useCaseProf.GetProfileWithCookie(&cookie_string); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	} else {
 		art.AuthorID = prof.Id
 	}
-	categoryName := c.QueryParam("category_name")
+
+	categoryName := c.Param("author")
 
 	if categoryID, err := h.useCaseArt.GetCategoryID(&categoryName); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
@@ -86,13 +86,9 @@ func (h *ArticleHandler) SubscribedArticles(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, result)
 }
 func (h *ArticleHandler) ArticlesByTag(c echo.Context) (err error) {
+	tagname := c.Param("tag")
 
-	tag := new(models.Tag)
-
-	if err = c.Bind(tag); err != nil {
-		return c.JSON(http.StatusBadRequest, err)
-	}
-	articles, err := h.useCaseArt.GetArticlesByTag(&tag.TagTitle)
+	articles, err := h.useCaseArt.GetArticlesByTag(&tagname)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}

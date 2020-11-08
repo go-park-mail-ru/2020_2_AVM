@@ -73,8 +73,8 @@ func main() {
 	// Routes
 
 	e.GET("/api/article/author/:author", serverConfig.ArticleHandler.ArticleByAuthor)
-	e.GET("/api/article/tag/", serverConfig.ArticleHandler.ArticlesByTag)
-	e.GET("/api/article/category/", serverConfig.ArticleHandler.ArticlesByCategory)
+	e.GET("/api/article/tag/:tag", serverConfig.ArticleHandler.ArticlesByTag)
+	e.GET("/api/article/category/:category", serverConfig.ArticleHandler.ArticlesByCategory)
 	e.GET("/api/article/subscribe/", serverConfig.ArticleHandler.SubscribedArticles)
 	e.GET("/api/avatar", serverConfig.profileHandler.AvatarDefault)
 	e.GET("/api/avatar/title/:name", serverConfig.profileHandler.Avatar)
