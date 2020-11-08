@@ -116,11 +116,9 @@ func (h *ArticleHandler) ArticlesByTag(c echo.Context) (err error) {
 
 func (h *ArticleHandler) ArticlesByCategory(c echo.Context) (err error) {
 
-	category := new(models.Category)
-	if err = c.Bind(category); err != nil {
-		return c.JSON(http.StatusBadRequest, err)
-	}
-	articles, err := h.useCaseArt.GetArticlesByCategory(&category.CategoryTitle)
+	category := c.Param("category")
+
+	articles, err := h.useCaseArt.GetArticlesByCategory(&category)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
