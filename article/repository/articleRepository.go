@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"gorm.io/gorm"
 	"sync"
@@ -59,18 +60,18 @@ func (adb *ArticleRepository) GetArticlesByName(title *string) ([]*models.Articl
 	var result []*models.Article
 
 	var err error
-	//var rows *sql.Rows
+	var rows *sql.Rows
 //	adb.mute.RLock()
 //	{
-		err = adb.conn.Table("articles").Where("article_title = ?", title).Find(result).Error
-		/*	rows, err = adb.conn.Table("article").Where("title = ?", title).Rows()
+		//err = adb.conn.Table("articles").Where("article_title = ?", title).Find(result).Error
+			rows, err = adb.conn.Table("article").Where("title = ?", title).Rows()
 			defer rows.Close()
 
 			for rows.Next() {
 				article := new(models.Article)
 				adb.conn.ScanRows(rows, article)
 				result = append(result, article)
-			}*/
+			}
 //	}
 //	adb.mute.RUnlock()
 
@@ -80,19 +81,19 @@ func (adb *ArticleRepository) GetArticlesByName(title *string) ([]*models.Articl
 func (adb *ArticleRepository) GetArticlesByAuthorId(authorId uint64) ([]*models.Article, error) {
 	var result []*models.Article
 
+	var rows *sql.Rows
 	var err error
-	//var rows *sql.Rows
-//	adb.mute.RLock()
-//	{
-		err = adb.conn.Table("articles").Where("authorid = ?", authorId).Find(result).Error
-		/*	rows, err = adb.conn.Table("article").Where("authorid = ?", authorId).Rows()
+	//	adb.mute.RLock()
+	//	{
+	err = adb.conn.Table("articles").Where("authorid = ?", authorId).Find(result).Error
+	rows, err = adb.conn.Table("article").Where("authorid = ?", authorId).Rows()
 			defer rows.Close()
 
 			for rows.Next() {
 				article := new(models.Article)
 				adb.conn.ScanRows(rows, article)
 				result = append(result, article)
-			}*/
+			}
 //	}
 //	adb.mute.RUnlock()
 
@@ -101,7 +102,7 @@ func (adb *ArticleRepository) GetArticlesByAuthorId(authorId uint64) ([]*models.
 
 func (adb *ArticleRepository) GetArticlesByCategory(category *string) ([]*models.Article, error) {
 	var result []*models.Article
-	//var rows *sql.Rows
+	var rows *sql.Rows
 	var err error
 //	adb.mute.RLock()
 //	{
@@ -109,14 +110,14 @@ func (adb *ArticleRepository) GetArticlesByCategory(category *string) ([]*models
 		err = adb.conn.Table("category").Where("title = ?", category).First(ctgr).Error
 		if err == nil {
 			err = adb.conn.Table("articles").Where("categoryid = ?", ctgr.Id).Find(result).Error
-			/*	rows, err = adb.conn.Table("article").Where("authorid = ?", authorId).Rows()
+				rows, err = adb.conn.Table("article").Where("authorid = ?", authorId).Rows()
 				defer rows.Close()
 
 				for rows.Next() {
 					article := new(models.Article)
 					adb.conn.ScanRows(rows, article)
 					result = append(result, article)
-				}*/
+				}
 		}
 //	}
 //	adb.mute.RUnlock()
@@ -157,14 +158,23 @@ func (adb *ArticleRepository) GetArticlesById(id uint64) (*models.Article, error
 func (adb *ArticleRepository) GetArticlesByTag(tag *string) ([]*models.Article, error) {
 	var result []*models.Article
 	var tagArticles []*models.TagArticle
-	//var rows *sql.Rows
 	var err error
 //	adb.mute.RLock()
 //	{
 		var tg = new(models.Tag)
 		err = adb.conn.Table("tag").Where("title = ?", tag).First(tg).Error //получаем id тэга
 		if err == nil {
-			err = adb.conn.Table("tag_article").Where("tagid = ?", tg.Id).Find(tagArticles).Error
+			//err = adb.conn.Table("tag_article").Where("tagid = ?", tg.Id).Find(tagArticles).Error
+			var rows *sql.Rows
+			rows, err = adb.conn.Table("tag_article").Where("tagid = ?", tg.Id).Rows()
+			defer rows.Close()
+
+			for rows.Next() {
+				tagArticle := new(models.TagArticle)
+				adb.conn.ScanRows(rows, tagArticle)
+				tagArticles = append(tagArticles, tagArticle)
+			}
+
 			if err == nil {
 				for _, tagArt := range tagArticles {
 					article, err := adb.GetArticlesById(tagArt.ArticleID)
@@ -246,8 +256,18 @@ func (adb *ArticleRepository) GetSubscribedCategories(profile *models.Profile) (
 	var err error
 //	adb.mute.RLock()
 //	{
-		err = adb.conn.Table("category_follow").Where("profileid = ?", profile.Id).Find(result).Error
-//	}
+//		err = adb.conn.Table("category_follow").Where("profileid = ?", profile.Id).Find(result).Error
+	var rows *sql.Rows
+	rows, err = adb.conn.Table("category_follow").Where("profileid = ?", profile.Id).Rows()
+	defer rows.Close()
+
+	for rows.Next() {
+		category := new(models.Category)
+		adb.conn.ScanRows(rows, category)
+		result = append(result, category)
+	}
+
+		//	}
 //	adb.mute.RUnlock()
 
 	return result, err
