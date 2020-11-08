@@ -70,11 +70,20 @@ func (h *ArticleUseCase) GetArticlesByTags( tag models.Tags ) ( []*models.Articl
 }
 
 func (h *ArticleUseCase) GetArticlesBySubscribe( profile *models.Profile ) ( []*models.Article, error ) {
-	result = new([]*models.Article)
+	var result []*models.Article
 
-	categories = h.DBConnArt.GetSubscribedCategories(profile)
+	categories, err := h.DBConnArt.GetSubscribedCategories(profile)
+	if err != nil {
+		return nil, err
+	}
+	for _, category := range categories{
+		buff_arts, err := h.DBConnArt.GetArticlesByCategory(&category.CategoryTitle)
+		if err == nil {
+			result = append(result, buff_arts...)
+		}
+	}
 
-	return nil, nil
+	return result, nil
 }
 
 func (h *ArticleUseCase) GetArticleIdByNameAndAuthorId (title *string, authorid uint64) (uint64, error) {
