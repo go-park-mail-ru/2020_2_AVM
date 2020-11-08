@@ -109,15 +109,13 @@ func (adb *ArticleRepository) GetArticlesByCategory(category *string) ([]*models
 		var ctgr = new(models.Category)
 		err = adb.conn.Table("category").Where("title = ?", category).First(ctgr).Error
 		if err == nil {
-			err = adb.conn.Table("articles").Where("categoryid = ?", ctgr.Id).Find(result).Error
-				rows, err = adb.conn.Table("article").Where("authorid = ?", authorId).Rows()
-				defer rows.Close()
-
-				for rows.Next() {
-					article := new(models.Article)
-					adb.conn.ScanRows(rows, article)
-					result = append(result, article)
-				}
+			rows, err = adb.conn.Table("article").Where("categoryid = ?", ctgr.Id).Rows()
+			defer rows.Close()
+			for rows.Next() {
+				article := new(models.Article)
+				adb.conn.ScanRows(rows, article)
+				result = append(result, article)
+			}
 		}
 //	}
 //	adb.mute.RUnlock()
