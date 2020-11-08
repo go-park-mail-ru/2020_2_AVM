@@ -107,7 +107,7 @@ func (adb *ArticleRepository) GetArticlesByCategory(category *string) ([]*models
 	//	adb.mute.RLock()
 	//	{
 	var ctgr = new(models.Category)
-	err = adb.conn.Table("category").Where("title = ?", category).First(ctgr).Error
+	err = adb.conn.Table("category").Where("category_title = ?", category).First(ctgr).Error
 	if err == nil {
 		rows, err = adb.conn.Table("article").Where("categoryid = ?", ctgr.Id).Rows()
 		defer rows.Close()
@@ -160,7 +160,7 @@ func (adb *ArticleRepository) GetArticlesByTag(tag *string) ([]*models.Article, 
 	//	adb.mute.RLock()
 	//	{
 	var tg = new(models.Tag)
-	err = adb.conn.Table("tag").Where("title = ?", tag).First(tg).Error //получаем id тэга
+	err = adb.conn.Table("tag").Where("tag_title = ?", tag).First(tg).Error //получаем id тэга
 	if err == nil {
 		//err = adb.conn.Table("tag_article").Where("tagid = ?", tg.Id).Find(tagArticles).Error
 		var rows *sql.Rows
