@@ -37,10 +37,7 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	}
 
 	category := new(models.Category)
-
-	if err = c.Bind(category); err != nil { //нужно забиндить имя
-		return c.JSON(http.StatusBadRequest, err)
-	}
+	category.CategoryTitle = c.FormValue("category_title")
 
 	if categoryID, err := h.useCaseArt.GetCategoryID(&category.CategoryTitle); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
@@ -57,9 +54,7 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	articleid, err := h.useCaseArt.GetArticleIdByNameAndAuthorId(&art.ArticleTitle, prof.Id)
 
 	tags := new(models.Tags) // нужно получить массив тэгов и потом для каждого вызвать Link
-	if err = c.Bind(tags); err != nil {
-		return c.JSON(http.StatusBadRequest, err)
-	}
+	tags.TagsValues = c.FormValue("tags")
 	for _, tag := range tags.TagsValues {
 		tagid, err  := h.useCaseArt.GetTagID(&tag.TagTitle)
 		if err != nil {
