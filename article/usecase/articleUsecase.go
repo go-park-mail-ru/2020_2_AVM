@@ -30,7 +30,7 @@ func (h *ArticleUseCase) GetTagID (title *string) (uint64, error){
 	if err != nil {
 		newtag := new(models.Tag)
 		newtag.TagTitle = *title
-		err := h.DBConnArt.CreateTag(*newtag)
+		err := h.DBConnArt.CreateTag(newtag)
 		if err != nil {
 			return 9999, err
 		}

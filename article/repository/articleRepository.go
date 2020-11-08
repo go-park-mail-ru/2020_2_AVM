@@ -190,7 +190,7 @@ func (adb *ArticleRepository) GetArticlesByTag(tag *string) ([]*models.Article, 
 
 }
 
-func (adb *ArticleRepository) CreateTag(tag models.Tag) error {
+func (adb *ArticleRepository) CreateTag(tag *models.Tag) error {
 	var err error
 //	adb.mute.Lock()
 //	{

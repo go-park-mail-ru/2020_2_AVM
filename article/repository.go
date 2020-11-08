@@ -14,7 +14,7 @@ type ArticleRepository interface {
 	GetAllCategories() ( []*models.Category, error )
 	CreateCategory( category models.Category ) error
 	GetArticlesByTag( tag *string ) ( []*models.Article, error )
-	CreateTag( tag models.Tag ) error
+	CreateTag( tag *models.Tag ) error
 	GetCategoryID (title *string) (uint64, error)
 	GetArticleIdByNameAndAuthorId (title *string, authorid uint64) (uint64, error)
 	GetTagID (title *string) (uint64, error)
