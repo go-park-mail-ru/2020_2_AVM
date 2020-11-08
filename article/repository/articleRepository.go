@@ -257,11 +257,16 @@ func (adb *ArticleRepository) GetSubscribedCategories(profile *models.Profile) (
 	//		err = adb.conn.Table("category_follow").Where("profileid = ?", profile.Id).Find(result).Error
 	var rows *sql.Rows
 	rows, err = adb.conn.Table("category_follow").Where("profileid = ?", profile.Id).Rows()
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
 
 	for rows.Next() {
+		categoryFollow := new(models.CategoryFollow)
+		adb.conn.ScanRows(rows, categoryFollow)
 		category := new(models.Category)
-		adb.conn.ScanRows(rows, category)
+		err = adb.conn.Table("category").Where("id = ?", categoryFollow.CategoryID).First(category).Error
 		result = append(result, category)
 	}
 
