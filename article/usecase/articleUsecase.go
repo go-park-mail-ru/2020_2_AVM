@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_AVM/article"
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 )
@@ -31,10 +30,8 @@ func (h *ArticleUseCase) GetTagID(title *string) (uint64, error) {
 	if err != nil {
 		newtag := new(models.Tag)
 		newtag.TagTitle = *title
-		err := h.DBConnArt.CreateTag(*newtag)
+		err := h.DBConnArt.CreateTag(newtag)
 		if err != nil {
-			fmt.Println("!!!!!!!!!!!!!!!!1")
-			fmt.Println(err)
 			return 9999, err
 		}
 		id, err = h.DBConnArt.GetTagID(title)
