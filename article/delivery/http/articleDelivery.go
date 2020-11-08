@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type ArticleHandler struct {
@@ -25,8 +26,11 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	art := new(models.Article)
 
 	cookie, err := c.Cookie("session_id")
-	if err = c.Bind(art); err != nil || cookie == nil {
-		return c.JSON(http.StatusBadRequest, err)
+	//заполняем art
+	{
+		art.ArticleTitle = c.FormValue("article_title")
+		art.Content = c.FormValue("content")
+		art.Description = c.FormValue("description")
 	}
 	cookie_string := cookie.Value
 	prof, err := h.useCaseProf.GetProfileWithCookie(&cookie_string)
@@ -53,10 +57,12 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	//GetArticleIdByNameAndAuthorId
 	articleid, err := h.useCaseArt.GetArticleIdByNameAndAuthorId(&art.ArticleTitle, prof.Id)
 
-	tags := new(models.Tags) // нужно получить массив тэгов и потом для каждого вызвать Link
-	tags.TagsValues = c.FormValue("tags")
-	for _, tag := range tags.TagsValues {
-		tagid, err  := h.useCaseArt.GetTagID(&tag.TagTitle)
+	tags := c.FormValue("tags")
+	tagsSplit := strings.Split(tags, ";")
+
+	for _, tag := range tagsSplit {
+		buff := tag
+		tagid, err  := h.useCaseArt.GetTagID(&buff)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, err)
 		}
