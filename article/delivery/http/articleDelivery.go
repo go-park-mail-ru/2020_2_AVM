@@ -138,10 +138,7 @@ func (h *ArticleHandler) SubscribeToCategory(c echo.Context) (err error) {
 	}
 
 	category := new(models.Category)
-
-	if err = c.Bind(category); err != nil || cookie == nil {
-		return c.JSON(http.StatusBadRequest, err)
-	}
+	category.CategoryTitle = c.FormValue("category_title")
 	category.Id, err = h.useCaseArt.GetCategoryID(&category.CategoryTitle)
 
 	if err != nil {
