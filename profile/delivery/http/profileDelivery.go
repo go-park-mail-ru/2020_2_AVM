@@ -15,13 +15,13 @@ import (
 )
 
 type ProfileHandler struct {
-	useCaseArt article.ArticleUsecase
+	useCaseArt  article.ArticleUsecase
 	useCaseProf profile.ProfileUsecase
 }
 
-func NewProfileHandler (uCA article.ArticleUsecase, uCP profile.ProfileUsecase) *ProfileHandler {
+func NewProfileHandler(uCA article.ArticleUsecase, uCP profile.ProfileUsecase) *ProfileHandler {
 	return &ProfileHandler{
-		useCaseArt: uCA,
+		useCaseArt:  uCA,
 		useCaseProf: uCP,
 	}
 }
@@ -45,11 +45,11 @@ func (h *ProfileHandler) Signup(c echo.Context) (err error) {
 func (h *ProfileHandler) Signin(c echo.Context) (err error) {
 	prof := new(models.Profile)
 	expiration := time.Now().Add(8 * time.Hour)
-	if err = c.Bind(prof); err != nil{
+	if err = c.Bind(prof); err != nil {
 		return c.JSON(http.StatusBadRequest, prof)
 	}
 
-	baseProfile, err  := h.useCaseProf.GetProfile(&prof.Login)
+	baseProfile, err := h.useCaseProf.GetProfile(&prof.Login)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
@@ -57,9 +57,9 @@ func (h *ProfileHandler) Signin(c echo.Context) (err error) {
 	if prof.Password == baseProfile.Password {
 		id := shortuuid.New()
 		cookie := http.Cookie{
-			Name:    "session_id",
-			Value: id,
-			Expires: expiration,
+			Name:     "session_id",
+			Value:    id,
+			Expires:  expiration,
 			HttpOnly: true,
 		}
 		c.SetCookie(&cookie)
@@ -98,7 +98,7 @@ func (h *ProfileHandler) Profile(c echo.Context) (err error) {
 
 	cookie_string := cookie.Value
 	answer, err := h.useCaseProf.GetProfileWithCookie(&cookie_string)
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -113,7 +113,7 @@ func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 	}
 	cookie_string := cookie.Value
 	profile, err := h.useCaseProf.GetProfileWithCookie(&cookie_string)
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -123,7 +123,7 @@ func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 
 	err = h.useCaseProf.UpdateProfile(profile, newProfile)
 
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -137,7 +137,7 @@ func (h *ProfileHandler) SubscribeProfileToCategory(c echo.Context) (err error) 
 	}
 	cookie_string := cookie.Value
 	profile, err := h.useCaseProf.GetProfileWithCookie(&cookie_string)
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -147,13 +147,13 @@ func (h *ProfileHandler) SubscribeProfileToCategory(c echo.Context) (err error) 
 	}
 	category.Id, err = h.useCaseArt.GetCategoryID(&category.CategoryTitle)
 
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	err = h.useCaseProf.SubscribeToCategory(profile, category)
 
-	if err != nil{
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -166,8 +166,8 @@ func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	cookie_string := cookie.Value
-	prof, err :=  h.useCaseProf.GetProfileWithCookie(&cookie_string)
-	if err != nil{
+	prof, err := h.useCaseProf.GetProfileWithCookie(&cookie_string)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
@@ -188,14 +188,13 @@ func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, "OK")
 }
 
-
 func (h *ProfileHandler) AvatarDefault(c echo.Context) (err error) { // rework
-	return c.File("./static/avatars/default_avatar.png")
+	return c.File("../static/avatars/default_avatar.png")
 }
 
 func (h *ProfileHandler) Avatar(c echo.Context) (err error) { // rework
 	filename := c.Param("name")
-	return c.File("./static/avatars/" + filename)
+	return c.File("../static/avatars/" + filename)
 }
 
 func (h *ProfileHandler) UploadAvatar(file *multipart.FileHeader, userID int) (err error, filename string) {
@@ -208,7 +207,7 @@ func (h *ProfileHandler) UploadAvatar(file *multipart.FileHeader, userID int) (e
 
 	name := shortuuid.New() + "image"
 	filename = name + ".jpeg"
-	dst, err := os.Create("./static/avatars/" + filename)
+	dst, err := os.Create("../static/avatars/" + filename)
 
 	if err != nil {
 		return err, ""
