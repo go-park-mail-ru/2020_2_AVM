@@ -29,7 +29,9 @@ func configureAPI() *ServerStruct {
 	mutex := sync.RWMutex{}
 
 	//dsn := "host=localhost user=avm_user password=qwerty123 dbname=avmvc port=5432 sslmode=disable"
-	dsn := "host=localhost user=mark password=mark dbname=mark_avm_db port=5432 sslmode=disable"
+	//dsn := "host=localhost user=mark password=mark dbname=mark_avm_db port=5432 sslmode=disable"
+	dsn := "host=localhost user=postgres password=mark dbname=postgres_db port=5432 sslmode=disable"
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {

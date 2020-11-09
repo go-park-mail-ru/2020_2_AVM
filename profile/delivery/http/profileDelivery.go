@@ -189,12 +189,12 @@ func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 }
 
 func (h *ProfileHandler) AvatarDefault(c echo.Context) (err error) { // rework
-	return c.File("../static/avatars/default_avatar.png")
+	return c.File("./static/avatars/default_avatar.png")
 }
 
 func (h *ProfileHandler) Avatar(c echo.Context) (err error) { // rework
 	filename := c.Param("name")
-	return c.File("../static/avatars/" + filename)
+	return c.File("./static/avatars/" + filename)
 }
 
 func (h *ProfileHandler) UploadAvatar(file *multipart.FileHeader, userID int) (err error, filename string) {
@@ -207,7 +207,7 @@ func (h *ProfileHandler) UploadAvatar(file *multipart.FileHeader, userID int) (e
 
 	name := shortuuid.New() + "image"
 	filename = name + ".jpeg"
-	dst, err := os.Create("../static/avatars/" + filename)
+	dst, err := os.Create("./static/avatars/" + filename)
 
 	if err != nil {
 		return err, ""
