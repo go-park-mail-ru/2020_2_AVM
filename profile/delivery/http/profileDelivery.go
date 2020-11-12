@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"github.com/go-park-mail-ru/2020_2_AVM/article"
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"github.com/go-park-mail-ru/2020_2_AVM/profile"
@@ -9,6 +8,7 @@ import (
 	"github.com/lithammer/shortuuid"
 	"github.com/microcosm-cc/bluemonday"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -32,6 +32,7 @@ func NewProfileHandler(uCA article.ArticleUsecase, uCP profile.ProfileUsecase, p
 func (h *ProfileHandler) Signup(c echo.Context) (err error) {
 	prof := new(models.Profile)
 	if err = c.Bind(prof); err != nil {
+		log.Println("Bind Profile", err)
 		return
 	}
 
@@ -122,6 +123,7 @@ func (h *ProfileHandler) ProfileEdit(c echo.Context) (err error) {
 	}
 
 	if err = c.Bind(newProfile); err != nil {
+		log.Println("Bind Profile", err)
 		return
 	}
 
@@ -147,6 +149,7 @@ func (h *ProfileHandler) SubscribeProfileToCategory(c echo.Context) (err error) 
 
 	category := new(models.Category)
 	if err = c.Bind(category); err != nil {
+		log.Println("Bind category", err)
 		return
 	}
 	category.Id, err = h.useCaseArt.GetCategoryID(&category.CategoryTitle)
@@ -183,7 +186,7 @@ func (h *ProfileHandler) ProfileEditAvatar(c echo.Context) (err error) {
 
 		err, filename := h.UploadAvatar(file, userIdInt)
 		if err != nil {
-			fmt.Println(err)
+			log.Println("Upload Avatar", err)
 		} else {
 			h.useCaseProf.ProfileAvatarUpdate(prof, &filename)
 		}
@@ -204,7 +207,7 @@ func (h *ProfileHandler) Avatar(c echo.Context) (err error) { // rework
 func (h *ProfileHandler) UploadAvatar(file *multipart.FileHeader, userID int) (err error, filename string) {
 	src, err := file.Open()
 	if err != nil {
-		fmt.Println(err)
+		log.Println("Open file", err)
 		return err, ""
 	}
 	defer src.Close()
@@ -214,11 +217,13 @@ func (h *ProfileHandler) UploadAvatar(file *multipart.FileHeader, userID int) (e
 	dst, err := os.Create("./static/avatars/" + filename)
 
 	if err != nil {
+		log.Println("Create file", err)
 		return err, ""
 	}
 	defer dst.Close()
 
 	if _, err = io.Copy(dst, src); err != nil {
+		log.Println("Copy file", err)
 		return err, ""
 	}
 

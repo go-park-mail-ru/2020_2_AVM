@@ -9,6 +9,7 @@ require (
 	github.com/labstack/gommon v0.3.0
 	github.com/lithammer/shortuuid v3.0.0+incompatible
 	github.com/microcosm-cc/bluemonday v1.0.4
+	gopkg.in/validator.v2 v2.0.0-20200605151824-2b28d334fa05
 	gorm.io/driver/postgres v1.0.5
 	gorm.io/gorm v1.20.5
 )

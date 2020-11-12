@@ -30,9 +30,7 @@ type ServerStruct struct {
 func configureAPI() *ServerStruct {
 	mutex := sync.RWMutex{}
 
-	////
 	p := bluemonday.UGCPolicy()
-	////
 
 	//dsn := "host=localhost user=avm_user password=qwerty123 dbname=avmvc port=5432 sslmode=disable"
 	dsn := "host=localhost user=mark password=mark dbname=mark_avm_db port=5432 sslmode=disable"

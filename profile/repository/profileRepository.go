@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"gorm.io/gorm"
+	"log"
 	"sync"
 )
 
@@ -36,6 +37,10 @@ func (pdb *ProfileRepository) CreateProfile(profile *models.Profile) error {
 	}
 	pdb.mute.Unlock()
 
+	if err != nil {
+		log.Println("Create profiles", err)
+	}
+
 	return err
 }
 func (pdb *ProfileRepository) DeleteProfile(profile *models.Profile) error {
@@ -45,6 +50,10 @@ func (pdb *ProfileRepository) DeleteProfile(profile *models.Profile) error {
 		err = pdb.conn.Table("profiles").Delete(profile).Error
 	}
 	pdb.mute.Unlock()
+
+	if err != nil {
+		log.Println("Delete from profiles", err)
+	}
 
 	return err
 }
@@ -59,6 +68,10 @@ func (pdb *ProfileRepository) GetProfile(login *string) (*models.Profile, error)
 	}
 	pdb.mute.RUnlock()
 
+	if err != nil {
+		log.Println("Select from profiles", err)
+	}
+
 	return profile, err
 }
 
@@ -72,6 +85,7 @@ func (pdb *ProfileRepository) UpdateProfile(profile *models.Profile, profileNew 
 	pdb.mute.RUnlock()
 
 	if err != nil {
+		log.Println("Select from profiles", err)
 		return err
 	}
 	if profileNew.Login != "" {
@@ -101,6 +115,10 @@ func (pdb *ProfileRepository) UpdateProfile(profile *models.Profile, profileNew 
 	}
 	pdb.mute.Unlock()
 
+	if err != nil {
+		log.Println("Save profiles", err)
+	}
+
 	return err
 
 }
@@ -115,6 +133,10 @@ func (pdb *ProfileRepository) GetProfileWithCookie(cookie *string) (*models.Prof
 	}
 	pdb.mute.RUnlock()
 
+	if err != nil {
+		log.Println("Select from profiles", err)
+	}
+
 	return profile, err
 }
 
@@ -128,6 +150,7 @@ func (pdb *ProfileRepository) SetCookieToProfile(profile *models.Profile, cookie
 	pdb.mute.RUnlock()
 
 	if err != nil {
+		log.Println("Select from profiles", err)
 		return err
 	}
 	prof.Cookie = *cookie
@@ -137,6 +160,10 @@ func (pdb *ProfileRepository) SetCookieToProfile(profile *models.Profile, cookie
 		err = pdb.conn.Table("profiles").Save(prof).Error
 	}
 	pdb.mute.Unlock()
+
+	if err != nil {
+		log.Println("Save profiles", err)
+	}
 
 	return err
 
@@ -153,6 +180,10 @@ func (pdb *ProfileRepository) SubscribeToCategory(profile *models.Profile, categ
 		err = pdb.conn.Table("category_follow").Create(sub).Error
 	}
 	pdb.mute.Unlock()
+
+	if err != nil {
+		log.Println("Create category_follow", err)
+	}
 
 	return err
 }

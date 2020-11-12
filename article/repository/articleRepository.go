@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/go-park-mail-ru/2020_2_AVM/models"
 	"gorm.io/gorm"
+	"log"
 	"sync"
 )
 
@@ -40,12 +41,20 @@ func (adb *ArticleRepository) CreateArticle(article *models.Article) error {
 
 	err = adb.conn.Table("articles").Create(article).Error
 
+	if err != nil {
+		log.Println("Create articles", err)
+	}
+
 	return err
 }
 func (adb *ArticleRepository) DeleteArticle(article *models.Article) error {
 	var err error
 
 	err = adb.conn.Table("articles").Delete(article).Error
+
+	if err != nil {
+		log.Println("Delete articles", err)
+	}
 
 	return err
 }
@@ -58,6 +67,10 @@ func (adb *ArticleRepository) GetArticlesByName(title *string) ([]*models.Articl
 
 	rows, err = adb.conn.Table("article").Where("title = ?", title).Rows()
 	defer rows.Close()
+
+	if err != nil {
+		log.Println("Select from articles", err)
+	}
 
 	for rows.Next() {
 		article := new(models.Article)
@@ -77,6 +90,10 @@ func (adb *ArticleRepository) GetArticlesByAuthorId(authorId uint64) ([]*models.
 	rows, err = adb.conn.Table("articles").Where("authorid = ?", authorId).Rows()
 	defer rows.Close()
 
+	if err != nil {
+		log.Println("Select from articles", err)
+	}
+
 	for rows.Next() {
 		article := new(models.Article)
 		adb.conn.ScanRows(rows, article)
@@ -93,6 +110,11 @@ func (adb *ArticleRepository) GetArticlesByCategory(category *string) ([]*models
 
 	var ctgr = new(models.Category)
 	err = adb.conn.Table("category").Where("category_title = ?", category).First(ctgr).Error
+
+	if err != nil {
+		log.Println("Select from category", err)
+	}
+
 	if err == nil {
 		rows, err = adb.conn.Table("articles").Where("categoryid = ?", ctgr.Id).Rows()
 		defer rows.Close()
@@ -115,6 +137,10 @@ func (adb *ArticleRepository) CreateCategory(category models.Category) error {
 	var err error
 	err = adb.conn.Table("category").Create(category).Error
 
+	if err != nil {
+		log.Println("Create category", err)
+	}
+
 	return err
 }
 
@@ -123,6 +149,10 @@ func (adb *ArticleRepository) GetArticlesById(id uint64) (*models.Article, error
 
 	var err error
 	err = adb.conn.Table("articles").Where("id = ?", id).First(result).Error
+
+	if err != nil {
+		log.Println("Create category", err)
+	}
 
 	return result, err
 }
@@ -134,6 +164,11 @@ func (adb *ArticleRepository) GetArticlesByTag(tag *string) ([]*models.Article, 
 
 	var tg = new(models.Tag)
 	err = adb.conn.Table("tag").Where("tag_title = ?", tag).First(tg).Error //получаем id тэга
+
+	if err != nil {
+		log.Println("Select from tag", err)
+	}
+
 	if err == nil {
 		var rows *sql.Rows
 		rows, err = adb.conn.Table("tag_article").Where("tagid = ?", tg.Id).Rows()
@@ -163,6 +198,10 @@ func (adb *ArticleRepository) CreateTag(tag *models.Tag) error {
 	var err error
 	err = adb.conn.Table("tag").Create(tag).Error
 
+	if err != nil {
+		log.Println("Create tag", err)
+	}
+
 	return err
 }
 
@@ -172,6 +211,10 @@ func (adb *ArticleRepository) GetCategoryID(title *string) (uint64, error) {
 	var err error
 	err = adb.conn.Table("category").Where("category_title = ?", title).First(category).Error
 
+	if err != nil {
+		log.Println("Select from category", err)
+	}
+
 	return category.Id, err
 }
 
@@ -180,6 +223,11 @@ func (adb *ArticleRepository) GetTagID(title *string) (uint64, error) {
 
 	var err error
 	err = adb.conn.Table("tag").Where("tag_title = ?", title).First(tag).Error
+
+	if err != nil {
+		log.Println("Select from tag", err)
+	}
+
 	return tag.Id, err
 }
 
@@ -188,6 +236,10 @@ func (adb *ArticleRepository) GetArticleIdByNameAndAuthorId(title *string, autho
 
 	var err error
 	err = adb.conn.Table("articles").Where("article_title = ? AND authorid = ?", title, authorid).First(article).Error
+
+	if err != nil {
+		log.Println("Select from articles", err)
+	}
 
 	return article.Id, err
 }
@@ -199,6 +251,7 @@ func (adb *ArticleRepository) GetSubscribedCategories(profile *models.Profile) (
 	var rows *sql.Rows
 	rows, err = adb.conn.Table("category_follow").Where("profileid = ?", profile.Id).Rows()
 	if err != nil {
+		log.Println("Select from category_follow", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -208,6 +261,11 @@ func (adb *ArticleRepository) GetSubscribedCategories(profile *models.Profile) (
 		adb.conn.ScanRows(rows, categoryFollow)
 		category := new(models.Category)
 		err = adb.conn.Table("category").Where("id = ?", categoryFollow.CategoryID).First(category).Error
+
+		if err != nil {
+			log.Println("Select from category", err)
+		}
+
 		result = append(result, category)
 	}
 	return result, err
@@ -219,6 +277,10 @@ func (adb *ArticleRepository) LinkTagAndArticle(tagid uint64, articleid uint64) 
 	tagarticle.TagID = tagid
 	var err error
 	err = adb.conn.Table("tag_article").Create(tagarticle).Error
+
+	if err != nil {
+		log.Println("Create tag_article", err)
+	}
 
 	return err
 }

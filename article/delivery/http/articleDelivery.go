@@ -67,9 +67,7 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	for _, tag := range tagsSplit {
 		buff := tag
 		tagid, _ := h.useCaseArt.GetTagID(&buff)
-		//if err != nil {
-		//	return c.JSON(http.StatusBadRequest, err)
-		//}
+
 		h.useCaseArt.LinkTagAndArticle(tagid, articleid)
 	}
 
