@@ -3,7 +3,9 @@ module github.com/go-park-mail-ru/2020_2_AVM
 go 1.15
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/golang/mock v1.4.4
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0
