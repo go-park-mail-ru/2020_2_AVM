@@ -1,4 +1,4 @@
-package repository_test
+package repository
 
 import (
 	"database/sql"
@@ -30,6 +30,8 @@ var (
 		CategoryTitle: "CategoryTitle",
 	}
 )
+
+// go test -coverprofile=coverage.out -coverpkg=./... -cover ./... && go tool cover -html=coverage.out
 
 // https://github.com/go-gorm/gorm/issues/3565
 
@@ -89,9 +91,11 @@ func TestCreateArticle(t *testing.T) {
 
 	s.mock.ExpectCommit()
 
+	err = CreateArticle(testArticle)
 	//if err = s.db.Create(testArticle).Error; err != nil {
-	//	t.Errorf("Failed to insert to gorm db, got error: %v", err)
-	//}
+	if err = s.db.Create(testArticle).Error; err != nil {
+		t.Errorf("Failed to insert to gorm db, got error: %v", err)
+	}
 	//
 	//err = s.mock.ExpectationsWereMet()
 	//if err != nil {

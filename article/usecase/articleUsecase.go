@@ -1,5 +1,7 @@
 package usecase
 
+// go generate ./...
+
 //go:generate mockgen -destination=../mocks/mock_ArticleUsecase.go -package=mocks github.com/go-park-mail-ru/2020_2_AVM/article ArticleUsecase
 
 import (
