@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2020_2_AVM/profile"
 	"github.com/labstack/echo"
 	"github.com/lithammer/shortuuid"
+	"github.com/microcosm-cc/bluemonday"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -17,12 +18,14 @@ import (
 type ProfileHandler struct {
 	useCaseArt  article.ArticleUsecase
 	useCaseProf profile.ProfileUsecase
+	pSanitizer  *bluemonday.Policy
 }
 
-func NewProfileHandler(uCA article.ArticleUsecase, uCP profile.ProfileUsecase) *ProfileHandler {
+func NewProfileHandler(uCA article.ArticleUsecase, uCP profile.ProfileUsecase, p *bluemonday.Policy) *ProfileHandler {
 	return &ProfileHandler{
 		useCaseArt:  uCA,
 		useCaseProf: uCP,
+		pSanitizer:  p,
 	}
 }
 
@@ -61,6 +64,7 @@ func (h *ProfileHandler) Signin(c echo.Context) (err error) {
 			Value:    id,
 			Expires:  expiration,
 			HttpOnly: true,
+			SameSite: http.SameSiteStrictMode,
 		}
 		c.SetCookie(&cookie)
 		cookie_string := cookie.Value

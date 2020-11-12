@@ -8,6 +8,8 @@ import (
 	profileDelivery "github.com/go-park-mail-ru/2020_2_AVM/profile/delivery/http"
 	profileRepository "github.com/go-park-mail-ru/2020_2_AVM/profile/repository"
 	profileUseCase "github.com/go-park-mail-ru/2020_2_AVM/profile/usecase"
+
+	"github.com/microcosm-cc/bluemonday"
 	"sync"
 
 	"gorm.io/driver/postgres"
@@ -28,9 +30,13 @@ type ServerStruct struct {
 func configureAPI() *ServerStruct {
 	mutex := sync.RWMutex{}
 
+	////
+	p := bluemonday.UGCPolicy()
+	////
+
 	//dsn := "host=localhost user=avm_user password=qwerty123 dbname=avmvc port=5432 sslmode=disable"
-	//dsn := "host=localhost user=mark password=mark dbname=mark_avm_db port=5432 sslmode=disable"
-	dsn := "host=localhost user=postgres password=mark dbname=postgres_db port=5432 sslmode=disable"
+	dsn := "host=localhost user=mark password=mark dbname=mark_avm_db port=5432 sslmode=disable"
+	//dsn := "host=localhost user=postgres password=mark dbname=postgres_db port=5432 sslmode=disable"
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
@@ -48,8 +54,8 @@ func configureAPI() *ServerStruct {
 	artUseCase := articleUseCase.NewArticleUseCase(artRepository)
 	profUseCase := profileUseCase.NewProfileUseCase(profRepository)
 
-	artHandler := articleDelivery.NewAricleHandler(artUseCase, profUseCase)
-	profHandler := profileDelivery.NewProfileHandler(artUseCase, profUseCase)
+	artHandler := articleDelivery.NewAricleHandler(artUseCase, profUseCase, p)
+	profHandler := profileDelivery.NewProfileHandler(artUseCase, profUseCase, p)
 
 	return &ServerStruct{
 		ArticleHandler: artHandler,

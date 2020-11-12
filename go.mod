@@ -8,6 +8,7 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0
 	github.com/lithammer/shortuuid v3.0.0+incompatible
+	github.com/microcosm-cc/bluemonday v1.0.4
 	gorm.io/driver/postgres v1.0.5
 	gorm.io/gorm v1.20.5
 )

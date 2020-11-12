@@ -8,17 +8,21 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/microcosm-cc/bluemonday"
 )
 
 type ArticleHandler struct {
 	useCaseArt  article.ArticleUsecase
 	useCaseProf profile.ProfileUsecase
+	pSanitizer  *bluemonday.Policy
 }
 
-func NewAricleHandler(uCA article.ArticleUsecase, uCP profile.ProfileUsecase) *ArticleHandler {
+func NewAricleHandler(uCA article.ArticleUsecase, uCP profile.ProfileUsecase, p *bluemonday.Policy) *ArticleHandler {
 	return &ArticleHandler{
 		useCaseArt:  uCA,
 		useCaseProf: uCP,
+		pSanitizer:  p,
 	}
 }
 
@@ -28,9 +32,9 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	cookie, err := c.Cookie("session_id")
 	//заполняем art
 	{
-		art.ArticleTitle = c.FormValue("article_title")
-		art.Content = c.FormValue("content")
-		art.Description = c.FormValue("description")
+		art.ArticleTitle = h.pSanitizer.Sanitize(c.FormValue("article_title"))
+		art.Content = h.pSanitizer.Sanitize(c.FormValue("content"))
+		art.Description = h.pSanitizer.Sanitize(c.FormValue("description"))
 	}
 	cookie_string := cookie.Value
 	prof, err := h.useCaseProf.GetProfileWithCookie(&cookie_string)
@@ -41,7 +45,7 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	}
 
 	category := new(models.Category)
-	category.CategoryTitle = c.FormValue("category_title")
+	category.CategoryTitle = h.pSanitizer.Sanitize(c.FormValue("category_title"))
 
 	if categoryID, err := h.useCaseArt.GetCategoryID(&category.CategoryTitle); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
@@ -57,7 +61,7 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 	//GetArticleIdByNameAndAuthorId
 	articleid, err := h.useCaseArt.GetArticleIdByNameAndAuthorId(&art.ArticleTitle, prof.Id)
 
-	tags := c.FormValue("tags")
+	tags := h.pSanitizer.Sanitize(c.FormValue("tags"))
 	tagsSplit := strings.Split(tags, ";")
 
 	for _, tag := range tagsSplit {
@@ -76,7 +80,7 @@ func (h *ArticleHandler) CreateArticle(c echo.Context) (err error) {
 }
 
 func (h *ArticleHandler) ArticleByAuthor(c echo.Context) (err error) {
-	key := c.Param("author")
+	key := h.pSanitizer.Sanitize(c.Param("author"))
 	id, _ := strconv.Atoi(key)
 	articles, err := h.useCaseArt.GetArticlesByAuthorId(uint64(id))
 	if err != nil {
@@ -105,7 +109,7 @@ func (h *ArticleHandler) SubscribedArticles(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, result)
 }
 func (h *ArticleHandler) ArticlesByTag(c echo.Context) (err error) {
-	tagname := c.Param("tag")
+	tagname := h.pSanitizer.Sanitize(c.Param("tag"))
 
 	articles, err := h.useCaseArt.GetArticlesByTag(&tagname)
 	if err != nil {
@@ -116,7 +120,7 @@ func (h *ArticleHandler) ArticlesByTag(c echo.Context) (err error) {
 
 func (h *ArticleHandler) ArticlesByCategory(c echo.Context) (err error) {
 
-	category := c.Param("category")
+	category := h.pSanitizer.Sanitize(c.Param("category"))
 
 	articles, err := h.useCaseArt.GetArticlesByCategory(&category)
 	if err != nil {
@@ -138,7 +142,7 @@ func (h *ArticleHandler) SubscribeToCategory(c echo.Context) (err error) {
 	}
 
 	category := new(models.Category)
-	category.CategoryTitle = c.FormValue("category_title")
+	category.CategoryTitle = h.pSanitizer.Sanitize(c.FormValue("category_title"))
 	category.Id, err = h.useCaseArt.GetCategoryID(&category.CategoryTitle)
 
 	if err != nil {
